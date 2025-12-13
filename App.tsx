@@ -232,9 +232,11 @@ const App: React.FC = () => {
                 {errorMessage && (
                   <div className="bg-red-900/80 border-2 border-red-500 text-red-200 p-2 text-center text-sm font-bold break-words">
                     <p>{errorMessage}</p>
-                    {errorMessage.includes("leaked") && (
-                        <p className="mt-2 text-yellow-300 bg-black/20 p-1">
-                          ⚠️ You might be using an old deployment. Check the build time in the footer. If it's old, please Redeploy in Vercel!
+                    {errorMessage.includes("GLY4") && (
+                        <p className="mt-2 text-yellow-300 bg-black/20 p-1 font-bold">
+                           CRITICAL: Your app is still using the BLOCKED key ending in GLY4. 
+                           <br/>
+                           This means Vercel did not update the build. Please go to Vercel Deployments and press "Redeploy" on the latest commit!
                         </p>
                     )}
                   </div>

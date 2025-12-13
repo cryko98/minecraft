@@ -11,18 +11,9 @@ export const generateMinecraftStyleImage = async (
   mimeType: string
 ): Promise<string> => {
   try {
-    // Initialize the client using process.env.API_KEY.
-    // The vite.config.ts ensures this is populated from VITE_API_KEY or API_KEY at build time.
-    let apiKey = process.env.API_KEY || '';
-    
-    // Trim any whitespace that might have been pasted in by accident
-    apiKey = apiKey.trim();
-
-    if (!apiKey) {
-      throw new Error("API Key is missing (process.env.API_KEY is empty).");
-    }
-
-    const ai = new GoogleGenAI({ apiKey });
+    // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
+    // Assume this variable is pre-configured, valid, and accessible in the execution context.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
     // Remove data URL prefix if present for the API call
     const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
@@ -45,7 +36,7 @@ export const generateMinecraftStyleImage = async (
     });
 
     // Extract the image from the response
-    if (response.candidates && response.candidates[0].content.parts) {
+    if (response.candidates && response.candidates[0].content && response.candidates[0].content.parts) {
       for (const part of response.candidates[0].content.parts) {
         if (part.inlineData) {
           const generatedBase64 = part.inlineData.data;
@@ -59,12 +50,12 @@ export const generateMinecraftStyleImage = async (
   } catch (error: any) {
     console.error('Gemini API Error:', error);
     
-    // Append the key suffix to the error message for debugging
+    // Debugging info
     const apiKey = process.env.API_KEY || '';
     const keySuffix = apiKey ? `...${apiKey.slice(-4)}` : 'undefined';
     const originalMessage = error.message || 'Unknown error';
     
     // Create a new error with the augmented message
-    throw new Error(`${originalMessage} (Key: ${keySuffix})`);
+    throw new Error(`${originalMessage} (Key Ending: ${keySuffix})`);
   }
 };
