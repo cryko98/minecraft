@@ -1,8 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Initialize the client
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 /**
  * Transforms an image into a Minecraft style using Gemini.
  * @param base64Image The base64 string of the uploaded image.
@@ -14,6 +11,19 @@ export const generateMinecraftStyleImage = async (
   mimeType: string
 ): Promise<string> => {
   try {
+    const apiKey = process.env.API_KEY;
+    
+    // Debug logging to help identify if the old key is still cached
+    if (apiKey) {
+      console.log(`[Gemini Service] Using API Key: ${apiKey.substring(0, 4)}... (Check if this matches your new key)`);
+    } else {
+      console.error("[Gemini Service] API Key is missing!");
+      throw new Error("API Key is missing. Please check your .env file and restart the server.");
+    }
+
+    // Initialize the client inside the function scope
+    const ai = new GoogleGenAI({ apiKey });
+
     // Remove data URL prefix if present for the API call
     const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
 

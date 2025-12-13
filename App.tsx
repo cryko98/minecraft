@@ -91,7 +91,33 @@ const App: React.FC = () => {
     } catch (error: any) {
       console.error(error);
       setStatus(AppStatus.ERROR);
-      setErrorMessage(error.message || 'Failed to craft image.');
+      
+      let msg = error.message || 'Failed to craft image.';
+      
+      // Handle Google API specific errors logic
+      try {
+        const errorStr = typeof msg === 'string' ? msg : JSON.stringify(msg);
+        
+        if (errorStr.includes('leaked') || errorStr.includes('PERMISSION_DENIED')) {
+             msg = "API KEY ERROR: Your API Key has been blocked by Google because it was exposed. Please generate a NEW key at aistudio.google.com, update your .env file, and RESTART the server.";
+        } else if (errorStr.includes('API Key is missing')) {
+             msg = "API Key is missing. Please check your .env file.";
+        } else if (errorStr.includes('{')) {
+            // Attempt to extract cleaner message from JSON string
+            const start = errorStr.indexOf('{');
+            const jsonPart = errorStr.substring(start);
+            try {
+                const jsonError = JSON.parse(jsonPart);
+                if (jsonError.error && jsonError.error.message) {
+                    msg = jsonError.error.message;
+                }
+            } catch(e) { /* ignore json parse error */ }
+        }
+      } catch (e) {
+        // ignore parsing error
+      }
+      
+      setErrorMessage(msg);
     }
   };
 
@@ -211,7 +237,7 @@ const App: React.FC = () => {
                    )}
                 </MinecraftButton>
                 {errorMessage && (
-                  <div className="bg-red-900/80 border-2 border-red-500 text-red-200 p-2 text-center text-sm">
+                  <div className="bg-red-900/80 border-2 border-red-500 text-red-200 p-2 text-center text-sm font-bold">
                     {errorMessage}
                   </div>
                 )}
