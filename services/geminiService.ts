@@ -13,7 +13,13 @@ export const generateMinecraftStyleImage = async (
   try {
     // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
     // Assume this variable is pre-configured, valid, and accessible in the execution context.
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const apiKey = process.env.API_KEY || '';
+    
+    if (!apiKey) {
+      throw new Error("API Key is missing. Check Vercel Environment Variables.");
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
 
     // Remove data URL prefix if present for the API call
     const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
@@ -50,12 +56,17 @@ export const generateMinecraftStyleImage = async (
   } catch (error: any) {
     console.error('Gemini API Error:', error);
     
-    // Debugging info
+    // Debugging info: Show start and end of key to verify which key is being used
     const apiKey = process.env.API_KEY || '';
-    const keySuffix = apiKey ? `...${apiKey.slice(-4)}` : 'undefined';
+    const keyLen = apiKey.length;
+    // Show first 4 and last 4 chars if possible
+    const keyMask = keyLen > 8 
+      ? `${apiKey.slice(0, 4)}...${apiKey.slice(-4)}` 
+      : 'INVALID_KEY_FORMAT';
+
     const originalMessage = error.message || 'Unknown error';
     
     // Create a new error with the augmented message
-    throw new Error(`${originalMessage} (Key Ending: ${keySuffix})`);
+    throw new Error(`${originalMessage} (Using Key: ${keyMask})`);
   }
 };

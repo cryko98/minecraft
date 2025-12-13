@@ -3,11 +3,11 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
-  // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
   const env = loadEnv(mode, '.', '');
 
-  // Prioritize VITE_API_KEY, fallback to API_KEY (for Vercel compatibility)
-  const apiKey = env.VITE_API_KEY || env.API_KEY || '';
+  // CRITICAL FIX: Prioritize process.env (Vercel system envs) over loaded .env files
+  // This ensures that when you update variables in Vercel, they take precedence immediately.
+  const apiKey = process.env.VITE_API_KEY || process.env.API_KEY || env.VITE_API_KEY || env.API_KEY || '';
 
   return {
     plugins: [react()],
