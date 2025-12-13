@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     define: {
-      // Maps VITE_API_KEY to process.env.API_KEY to satisfy SDK requirements while using Vite
+      // Expose process.env.API_KEY via define for the SDK
       'process.env.API_KEY': JSON.stringify(env.VITE_API_KEY || env.API_KEY),
     },
   };

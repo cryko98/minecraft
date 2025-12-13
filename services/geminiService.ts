@@ -10,16 +10,10 @@ export const generateMinecraftStyleImage = async (
   base64Image: string,
   mimeType: string
 ): Promise<string> => {
-  let apiKey = '';
   try {
-    apiKey = process.env.API_KEY || '';
-    
-    if (!apiKey) {
-      throw new Error("API Key is missing from environment variables.");
-    }
-
-    // Initialize the client inside the function scope to ensure fresh config
-    const ai = new GoogleGenAI({ apiKey });
+    // Initialize the client using process.env.API_KEY as per guidelines.
+    // Ensure the Vite config defines 'process.env.API_KEY'.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
     // Remove data URL prefix if present for the API call
     const cleanBase64 = base64Image.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, '');
@@ -57,6 +51,7 @@ export const generateMinecraftStyleImage = async (
     console.error('Gemini API Error:', error);
     
     // Append the key suffix to the error message for debugging
+    const apiKey = process.env.API_KEY;
     const keySuffix = apiKey ? `...${apiKey.slice(-4)}` : 'undefined';
     const originalMessage = error.message || 'Unknown error';
     
