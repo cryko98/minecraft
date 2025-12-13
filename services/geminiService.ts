@@ -10,18 +10,15 @@ export const generateMinecraftStyleImage = async (
   base64Image: string,
   mimeType: string
 ): Promise<string> => {
+  let apiKey = '';
   try {
-    const apiKey = process.env.API_KEY;
+    apiKey = process.env.API_KEY || '';
     
-    // Debug logging to help identify if the old key is still cached
-    if (apiKey) {
-      console.log(`[Gemini Service] Using API Key: ${apiKey.substring(0, 4)}... (Check if this matches your new key)`);
-    } else {
-      console.error("[Gemini Service] API Key is missing!");
-      throw new Error("API Key is missing. Please check your .env file and restart the server.");
+    if (!apiKey) {
+      throw new Error("API Key is missing from environment variables.");
     }
 
-    // Initialize the client inside the function scope
+    // Initialize the client inside the function scope to ensure fresh config
     const ai = new GoogleGenAI({ apiKey });
 
     // Remove data URL prefix if present for the API call
@@ -56,8 +53,14 @@ export const generateMinecraftStyleImage = async (
     }
 
     throw new Error('No image generated in response.');
-  } catch (error) {
+  } catch (error: any) {
     console.error('Gemini API Error:', error);
-    throw error;
+    
+    // Append the key suffix to the error message for debugging
+    const keySuffix = apiKey ? `...${apiKey.slice(-4)}` : 'undefined';
+    const originalMessage = error.message || 'Unknown error';
+    
+    // Create a new error with the augmented message
+    throw new Error(`${originalMessage} (Using Key Ending: ${keySuffix})`);
   }
 };
