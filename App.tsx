@@ -231,7 +231,12 @@ const App: React.FC = () => {
                 </MinecraftButton>
                 {errorMessage && (
                   <div className="bg-red-900/80 border-2 border-red-500 text-red-200 p-2 text-center text-sm font-bold break-words">
-                    {errorMessage}
+                    <p>{errorMessage}</p>
+                    {errorMessage.includes("leaked") && (
+                        <p className="mt-2 text-yellow-300 bg-black/20 p-1">
+                          ⚠️ You might be using an old deployment. Check the build time in the footer. If it's old, please Redeploy in Vercel!
+                        </p>
+                    )}
                   </div>
                 )}
               </div>
@@ -309,6 +314,9 @@ const App: React.FC = () => {
             $MINECRAFT is a memecoin with no intrinsic value or expectation of financial return. 
             The coin is for entertainment purposes only. Not affiliated with Mojang or Microsoft.
           </p>
+          <div className="mt-4 text-stone-800 text-xs font-mono">
+            Build: {process.env.BUILD_TIME || 'Unknown'}
+          </div>
           <p className="text-stone-700 text-xs mt-4">© 2024 Minecraftification</p>
         </div>
       </footer>
