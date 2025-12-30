@@ -1,5 +1,6 @@
+
 import React, { useState, useRef } from 'react';
-import { generateMinecraftStyleImage } from './services/geminiService';
+import { generateMeme } from './services/geminiService';
 import { AppStatus } from './types';
 
 // Icons
@@ -9,53 +10,50 @@ const XIcon = () => (
   </svg>
 );
 
-const PickaxeIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14.5 5.5C14.5 5.5 15.5 3 17 3.5C18.5 4 20 5 20.5 6.5C21 8 18.5 9 18.5 9"/>
-    <path d="M14.5 5.5L4 16C3.5 16.5 3.5 17.5 4 18L6 20C6.5 20.5 7.5 20.5 8 20L18.5 9.5"/>
-    <path d="M13 11L9 7"/>
-  </svg>
-);
-
 const MenuIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="3" y1="12" x2="21" y2="12"></line>
-    <line x1="3" y1="6" x2="21" y2="6"></line>
-    <line x1="3" y1="18" x2="21" y2="18"></line>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+    <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
   </svg>
 );
 
-// Reusable Minecraft Components
+const WalletIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+    <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M16 8h2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M20 12h-4"/>
+  </svg>
+);
+
 const MinecraftButton: React.FC<{ 
   onClick?: () => void; 
   disabled?: boolean; 
   children: React.ReactNode; 
   className?: string; 
-  variant?: 'gray' | 'green' | 'blue';
+  variant?: 'gray' | 'green' | 'blue' | 'pink' | 'yellow';
 }> = ({ onClick, disabled, children, className = '', variant = 'gray' }) => {
   let baseColor = 'bg-stone-400';
-  if (variant === 'green') baseColor = 'bg-lime-600 text-white';
-  if (variant === 'blue') baseColor = 'bg-blue-600 text-white';
+  if (variant === 'green') baseColor = 'bg-[#4da33c] hover:bg-[#5ebc4a] text-white';
+  if (variant === 'blue') baseColor = 'bg-[#3c8dad] hover:bg-[#4ea6c9] text-white';
+  if (variant === 'pink') baseColor = 'bg-[#ff85a1] hover:bg-[#ff99b1] text-white';
+  if (variant === 'yellow') baseColor = 'bg-[#f7d51d] hover:bg-[#ffe042] text-black';
   
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`minecraft-btn relative px-6 py-3 font-bold text-xl uppercase tracking-widest ${baseColor} border-2 border-black disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-transform ${className}`}
+      className={`minecraft-btn relative px-6 py-3 font-bold text-xl uppercase tracking-widest ${baseColor} border-4 border-black disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all shadow-[4px_4px_0_rgba(0,0,0,1)] ${className}`}
     >
       {children}
     </button>
   );
 };
 
-const MinecraftPanel: React.FC<{ children: React.ReactNode; className?: string; title?: string }> = ({ children, className = '', title }) => (
-  <div className={`minecraft-panel bg-stone-300 p-1 ${className}`}>
+const MinecraftPanel: React.FC<{ children: React.ReactNode; className?: string; title?: string; accent?: string }> = ({ children, className = '', title, accent = 'bg-stone-500' }) => (
+  <div className={`minecraft-panel bg-[#d1d1d1] p-1 border-4 border-black shadow-[8px_8px_0_rgba(0,0,0,0.1)] ${className}`}>
     {title && (
-      <div className="bg-stone-500 text-white px-2 py-1 mb-2 border-b-4 border-stone-700 text-lg">
+      <div className={`${accent} text-white px-3 py-2 mb-2 border-b-4 border-black text-xl uppercase font-bold tracking-tighter`}>
         {title}
       </div>
     )}
-    <div className="bg-stone-300/50 p-2 h-full">
+    <div className="bg-[#e2e2e2] p-4 h-full border-2 border-white/50">
       {children}
     </div>
   </div>
@@ -64,255 +62,279 @@ const MinecraftPanel: React.FC<{ children: React.ReactNode; className?: string; 
 const App: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [prompt, setPrompt] = useState('');
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [status, setStatus] = useState<AppStatus>(AppStatus.IDLE);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const CA = "8TB4mYMMtjbpW9P7KsEupAGBQxk8ipnPJFAH8mVCpump";
+  const TICKER = "$BANK";
+  const LOGO_URL = "https://pbs.twimg.com/profile_images/2005588300828971008/s-KpyDgj.jpg";
+  const BANNER_URL = "https://c4.wallpaperflare.com/wallpaper/128/632/6/minecraft-digital-video-game-landscape-digital-artist-3d-graphics-hd-wallpaper-thumb.jpg";
+  const X_LINK = "https://x.com/FlyWheelPiggy";
+  const PUMP_LINK = `https://pump.fun/coin/${CA}`;
+
+  const randomMemes = [
+    "Piggy bank sitting on a throne of diamond blocks like a king",
+    "Piggy bank flying a blocky helicopter over a sunny meadow",
+    "Piggy bank holding a giant golden $BANK coin",
+    "Piggy bank driving a voxel sports car through a bright desert",
+    "Piggy bank swimming in a sea of emerald blocks",
+    "Piggy bank wearing a golden crown in a sunny village square",
+    "Piggy bank riding a blocky turtle through a coral reef",
+    "Piggy bank mining rare blocks under a bright pixel sun"
+  ];
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
       setFile(selectedFile);
-      
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
+      reader.onloadend = () => setPreviewUrl(reader.result as string);
       reader.readAsDataURL(selectedFile);
-      
-      // Reset previous generation
-      setGeneratedImage(null);
-      setStatus(AppStatus.IDLE);
     }
   };
 
-  const convertToMinecraft = async () => {
-    if (!file || !previewUrl) return;
-
+  const generateMemeAction = async (customPrompt?: string) => {
+    const finalPrompt = customPrompt || prompt || "A very happy blocky piggy bank in a sunny world";
     setStatus(AppStatus.PROCESSING);
     setErrorMessage('');
-
     try {
-      const result = await generateMinecraftStyleImage(previewUrl, file.type);
+      const result = await generateMeme(finalPrompt, previewUrl || undefined, file?.type);
       setGeneratedImage(result);
       setStatus(AppStatus.SUCCESS);
     } catch (error: any) {
       console.error(error);
       setStatus(AppStatus.ERROR);
-      
-      let msg = error.message || 'Failed to craft image.';
-      
-      // Try to parse the error message more cleanly if it's JSON
-      if (msg.includes('{')) {
-        const start = msg.indexOf('{');
-        const end = msg.lastIndexOf('}') + 1;
-        try {
-          const jsonPart = JSON.parse(msg.substring(start, end));
-          if (jsonPart.error && jsonPart.error.message) {
-            // Keep the key suffix info which is appended after the JSON usually
-            const suffixInfo = msg.substring(end); 
-            msg = `Google API Error: ${jsonPart.error.message} ${suffixInfo}`;
-          }
-        } catch (e) {
-          // If parse fails, just use original string
-        }
-      }
-
-      setErrorMessage(msg);
+      setErrorMessage(error.message || 'Crafting failed.');
     }
   };
 
+  const handleRandom = () => {
+    const random = randomMemes[Math.floor(Math.random() * randomMemes.length)];
+    setPrompt(random);
+    generateMemeAction(random);
+  };
+
+  const copyCA = () => {
+    navigator.clipboard.writeText(CA);
+    alert("Contract Address Copied!");
+  };
+
   return (
-    <div className="min-h-screen bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-[#5d4037] text-white overflow-x-hidden selection:bg-lime-500 selection:text-black">
+    <div className="min-h-screen text-black overflow-x-hidden selection:bg-[#f7d51d] selection:text-black relative">
+      {/* Background Image */}
+      <div className="fixed inset-0 -z-10 bg-[url('https://cdn.wallpapersafari.com/83/14/NKVgFh.jpg')] bg-cover bg-center bg-no-repeat bg-fixed"></div>
+      
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#2a2a2a] border-b-4 border-black p-4 shadow-lg">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#4da33c] border-b-4 border-black p-4 shadow-lg">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <img 
-              src="https://pbs.twimg.com/media/G8Am6k2XkAg4jUm?format=jpg&name=small" 
-              alt="Logo" 
-              className="w-10 h-10 md:w-12 md:h-12 border-4 border-black animate-bounce object-cover" 
-            />
-            <h1 className="text-2xl md:text-3xl text-yellow-400 drop-shadow-[4px_4px_0_rgba(0,0,0,1)]">
-              $MINECRAFT
-            </h1>
+            <img src={LOGO_URL} alt="Logo" className="w-12 h-12 border-4 border-black object-cover" />
+            <h1 className="text-3xl text-white drop-shadow-[4px_4px_0_rgba(0,0,0,1)] font-bold tracking-tighter">FLYWHEEL PIGGY BANK</h1>
           </div>
-          
-          {/* Desktop Menu */}
-          <div className="hidden md:flex gap-6 text-xl text-stone-300">
-            <a href="#generator" className="hover:text-white hover:underline decoration-4 decoration-lime-500">Generator</a>
-            <a href="#tokenomics" className="hover:text-white hover:underline decoration-4 decoration-lime-500">Tokenomics</a>
-            <a href="https://x.com/i/communities/1999638163858641117" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">Community</a>
+          <div className="hidden md:flex gap-8 text-xl text-white font-bold">
+            <a href="#workshop" className="hover:text-[#f7d51d] transition-colors">WORKSHOP</a>
+            <a href="#howtobuy" className="hover:text-[#f7d51d] transition-colors">HOW TO BUY</a>
+            <a href="#tokenomics" className="hover:text-[#f7d51d] transition-colors">STATS</a>
           </div>
-
-          {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden p-2 bg-stone-600 border-2 border-black text-white active:bg-stone-500"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? (
-              <svg viewBox="0 0 24 24" className="h-6 w-6 fill-current"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-            ) : (
-              <MenuIcon />
-            )}
-          </button>
+          <div className="flex gap-4 items-center">
+             <a href={X_LINK} target="_blank" rel="noopener noreferrer" className="bg-white p-2 border-2 border-black hover:bg-sky-100 transition-colors">
+               <XIcon />
+             </a>
+             <button className="md:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+               <MenuIcon />
+             </button>
+          </div>
         </div>
-
-        {/* Mobile Dropdown */}
         {isMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-[#2a2a2a] border-b-4 border-black border-t-2 border-t-stone-700 p-4 flex flex-col gap-4 shadow-xl">
-            <a 
-              href="#generator" 
-              onClick={() => setIsMenuOpen(false)}
-              className="text-xl text-white py-2 border-b-2 border-stone-700 hover:bg-stone-800"
-            >
-              Generator
-            </a>
-            <a 
-              href="#tokenomics" 
-              onClick={() => setIsMenuOpen(false)}
-              className="text-xl text-white py-2 border-b-2 border-stone-700 hover:bg-stone-800"
-            >
-              Tokenomics
-            </a>
-            <a 
-              href="https://x.com/i/communities/1999638163858641117" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              onClick={() => setIsMenuOpen(false)} 
-              className="text-xl text-blue-400 py-2 hover:bg-stone-800 flex items-center gap-2"
-            >
-               Join Community <span className="text-xs">↗</span>
-            </a>
+          <div className="md:hidden bg-[#4da33c] border-t-4 border-black p-6 flex flex-col gap-4 text-white text-2xl font-bold">
+            <a href="#workshop" onClick={() => setIsMenuOpen(false)}>WORKSHOP</a>
+            <a href="#howtobuy" onClick={() => setIsMenuOpen(false)}>HOW TO BUY</a>
+            <a href="#tokenomics" onClick={() => setIsMenuOpen(false)}>STATS</a>
           </div>
         )}
       </nav>
 
-      {/* Hero Section */}
-      <header className="pt-28 pb-10 md:pt-32 md:pb-20 px-4 text-center relative overflow-hidden">
-        <div className="max-w-4xl mx-auto relative z-10">
-          <div className="bg-black/50 p-4 md:p-8 border-4 border-white/20 backdrop-blur-sm inline-block rounded-none mb-8 w-full">
-            <img 
-              src="https://pbs.twimg.com/community_banner_img/1999636476016140288/vII_BJJW?format=jpg&name=small" 
-              alt="Minecraftification Banner" 
-              className="w-full mb-6 border-4 border-black shadow-lg"
-            />
-            <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl mb-4 md:mb-6 text-white drop-shadow-[4px_4px_0_#000] md:drop-shadow-[6px_6px_0_#000] tracking-tighter break-words">
-              MINECRAFTIFICATION
+      {/* Hero Header */}
+      <header className="pt-32 pb-20 px-4 text-center relative overflow-hidden">
+        {/* The Sun - Brighter & More Vibrant */}
+        <div className="absolute top-24 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-24 w-32 h-32 bg-[#FFD700] border-4 border-black shadow-[0_0_80px_rgba(255,215,0,0.6)] animate-pulse rounded-none"></div>
+        
+        <div className="max-w-5xl mx-auto relative z-10">
+          <div className="bg-white/90 p-6 md:p-8 border-4 border-black shadow-[12px_12px_0_rgba(0,0,0,0.1)] relative">
+            {/* Top Grass Border */}
+            <div className="absolute top-0 left-0 right-0 h-4 bg-[#5ebc4a] border-b-2 border-black/20"></div>
+            
+            <div className="mt-4 mb-8">
+              <img src={BANNER_URL} alt="Minecraft World Banner" className="w-full h-auto max-h-[300px] object-cover border-4 border-black shadow-[4px_4px_0_#000]" />
+            </div>
+            
+            <h2 className="text-6xl md:text-9xl mb-4 text-black font-bold drop-shadow-[4px_4px_0_#fff] leading-tight uppercase tracking-tighter">
+              {TICKER}
             </h2>
-            <p className="text-xl md:text-3xl text-lime-400 mb-6 md:mb-8 drop-shadow-[2px_2px_0_#000]">
-              The Blockiest Memecoin on Solana
+            
+            <p className="text-2xl md:text-4xl text-[#3c8dad] mb-12 font-bold drop-shadow-[1px_1px_0_#fff] uppercase">
+              THE BRIGHTEST BANK IN THE BLOCKVERSE
             </p>
             
-            <div className="bg-stone-800 p-3 md:p-4 border-4 border-stone-600 mb-8 max-w-xl mx-auto">
-              <p className="text-stone-400 text-xs md:text-sm mb-1 uppercase tracking-wider">Contract Address (SOL)</p>
-              <div className="flex items-center justify-between gap-2 bg-black/50 p-2 border-2 border-stone-900 overflow-hidden">
-                <code className="text-lime-300 truncate text-sm md:text-base">AfsPxLpgJZBpm6vLgBwBi8F8izuJ9kPVCqDwxWyTbonk</code>
-                <button className="shrink-0 text-xs bg-stone-600 hover:bg-stone-500 active:bg-stone-400 px-2 py-1 uppercase" onClick={() => alert("Copied!")}>Copy</button>
+            <div className="bg-[#e8f5e9] p-6 border-4 border-black mb-12 max-w-2xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="text-left w-full">
+                <span className="text-xs uppercase text-stone-500 font-bold block mb-1">OFFICIAL VAULT (CA)</span>
+                <code className="text-black break-all text-sm md:text-xl font-mono font-bold">{CA}</code>
               </div>
+              <MinecraftButton variant="yellow" className="w-full md:w-auto py-2 px-8 text-sm" onClick={copyCA}>
+                COPY
+              </MinecraftButton>
             </div>
 
-            <div className="flex flex-col md:flex-row justify-center gap-4">
-               <MinecraftButton variant="green" className="w-full md:w-auto">
-                 Buy $MINECRAFT
-               </MinecraftButton>
-               <a href="https://x.com/i/communities/1999638163858641117" target="_blank" rel="noopener noreferrer" className="w-full md:w-auto">
-                 <MinecraftButton variant="blue" className="w-full flex items-center justify-center gap-2">
-                   <XIcon /> Join Community
-                 </MinecraftButton>
-               </a>
+            <div className="flex flex-col md:flex-row justify-center gap-6">
+              <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer" className="w-full md:w-72">
+                <MinecraftButton variant="green" className="w-full">
+                  BUY ON PUMP.FUN
+                </MinecraftButton>
+              </a>
+              <MinecraftButton variant="blue" className="w-full md:w-72">
+                DEXSCREENER
+              </MinecraftButton>
             </div>
           </div>
         </div>
-        
-        {/* Decorative Blocks - Hidden on mobile to save space */}
-        <div className="hidden md:block absolute top-40 left-10 w-16 h-16 bg-lime-600 border-4 border-black opacity-80 rotate-12"></div>
-        <div className="hidden md:block absolute bottom-10 right-20 w-24 h-24 bg-stone-600 border-4 border-black opacity-80 -rotate-6"></div>
       </header>
 
-      {/* Generator Section */}
-      <section id="generator" className="py-10 md:py-20 px-4 bg-[#3E2723] border-t-8 border-black shadow-[inset_0_10px_20px_rgba(0,0,0,0.5)]">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-8 md:mb-12">
-            <h3 className="text-4xl md:text-5xl mb-2 md:mb-4 text-white drop-shadow-[4px_4px_0_#000]">Craft Your Avatar</h3>
-            <p className="text-lg md:text-xl text-stone-300">Turn any image into a masterpiece.</p>
+      {/* How to Buy on Pump.fun Section */}
+      <section id="howtobuy" className="py-24 px-4 bg-[#3c8dad]/90 border-y-8 border-black">
+        <div className="max-w-6xl mx-auto">
+          <h3 className="text-5xl md:text-7xl text-center mb-20 text-white drop-shadow-[6px_6px_0_#000] font-bold uppercase tracking-tighter">
+            HOW TO JOIN THE VAULT
+          </h3>
+          
+          <div className="grid md:grid-cols-4 gap-8">
+            <MinecraftPanel title="1. CRAFT WALLET" accent="bg-[#4da33c]">
+              <div className="text-center">
+                <div className="text-5xl mb-4">🦊</div>
+                <p className="text-lg font-bold">Download Phantom or Solflare. This is your personal inventory for {TICKER}.</p>
+              </div>
+            </MinecraftPanel>
+            
+            <MinecraftPanel title="2. MINE SOL" accent="bg-[#f7d51d]">
+              <div className="text-center">
+                <div className="text-5xl mb-4">💎</div>
+                <p className="text-lg font-bold text-black">Fill your wallet with SOL from any exchange. You need it to swap for the good stuff.</p>
+              </div>
+            </MinecraftPanel>
+            
+            <MinecraftPanel title="3. PUMP.FUN" accent="bg-[#ff85a1]">
+              <div className="text-center">
+                <div className="text-5xl mb-4">🍄</div>
+                <p className="text-lg font-bold">Head over to Pump.fun and paste our CA into the search bar. Look for the Piggy!</p>
+              </div>
+            </MinecraftPanel>
+            
+            <MinecraftPanel title="4. SWAP & HODL" accent="bg-[#4da33c]">
+              <div className="text-center">
+                <div className="text-5xl mb-4">🐷</div>
+                <p className="text-lg font-bold">Swap your SOL for {TICKER}. Sit back and watch the bank grow!</p>
+              </div>
+            </MinecraftPanel>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 items-start">
-            {/* Input Panel */}
-            <MinecraftPanel title="Inventory (Upload)" className="min-h-[350px] md:min-h-[400px]">
-              <div className="flex flex-col h-full gap-4">
-                <div 
-                  className={`flex-1 border-4 border-dashed border-stone-500 bg-stone-800/50 flex flex-col items-center justify-center p-4 md:p-6 cursor-pointer hover:bg-stone-800/80 active:bg-stone-800 transition-colors ${previewUrl ? 'border-solid border-lime-500' : ''}`}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  {previewUrl ? (
-                    <img src={previewUrl} alt="Preview" className="max-h-48 md:max-h-64 object-contain pixelated shadow-lg" />
-                  ) : (
-                    <div className="text-center text-stone-400">
-                      <div className="mx-auto w-12 h-12 md:w-16 md:h-16 mb-4 border-4 border-stone-600 bg-stone-700 flex items-center justify-center">
-                        <span className="text-3xl md:text-4xl">+</span>
-                      </div>
-                      <p className="text-lg md:text-base">Tap to select image</p>
-                    </div>
-                  )}
-                  <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    className="hidden" 
-                    accept="image/*"
-                    onChange={handleFileChange}
+          <div className="mt-16 text-center">
+            <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer">
+              <MinecraftButton variant="yellow" className="animate-pulse px-12 py-6 text-2xl">
+                OPEN PUMP.FUN NOW
+              </MinecraftButton>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Meme Workshop Section */}
+      <section id="workshop" className="py-24 px-4 bg-white/90 border-b-8 border-black relative overflow-hidden">
+        {/* Decorative Pixel Grass */}
+        <div className="absolute top-0 left-0 right-0 h-10 bg-[#5ebc4a] border-b-4 border-black"></div>
+        
+        <div className="max-w-5xl mx-auto mt-16">
+          <div className="text-center mb-20">
+            <h3 className="text-5xl md:text-8xl mb-6 text-black font-bold drop-shadow-[4px_4px_0_#f7d51d] uppercase tracking-tighter">
+              MEME CRAFTER
+            </h3>
+            <p className="text-2xl text-[#3c8dad] font-bold uppercase">GENERATE SUNNY {TICKER} MEMES</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12">
+            <MinecraftPanel title="CRAFTING SLOTS" accent="bg-[#4da33c]">
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm uppercase font-black text-stone-500">WHAT'S THE PIGGY DOING?</label>
+                  <textarea 
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    placeholder="Describe a happy sunny scene..."
+                    className="w-full bg-[#f9f9f9] border-4 border-black p-4 text-xl font-mono focus:outline-none focus:ring-4 ring-[#f7d51d] h-40 resize-none"
                   />
                 </div>
-                
-                <MinecraftButton 
-                  onClick={convertToMinecraft}
-                  disabled={!file || status === AppStatus.PROCESSING}
-                  variant="green"
-                  className="w-full flex justify-center items-center gap-2 py-4 md:py-3"
-                >
-                   {status === AppStatus.PROCESSING ? (
-                     <>Processing...</>
-                   ) : (
-                     <>
-                       <PickaxeIcon /> Craft Block
-                     </>
-                   )}
-                </MinecraftButton>
-                {errorMessage && (
-                  <div className="bg-red-900/80 border-2 border-red-500 text-red-200 p-2 text-center text-sm font-bold break-words">
-                    <p>{errorMessage}</p>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <MinecraftButton 
+                    onClick={() => generateMemeAction()} 
+                    disabled={status === AppStatus.PROCESSING}
+                    variant="pink"
+                    className="flex-1"
+                  >
+                    {status === AppStatus.PROCESSING ? 'CRAFTING...' : 'MINT MEME'}
+                  </MinecraftButton>
+                  <MinecraftButton 
+                    onClick={handleRandom} 
+                    disabled={status === AppStatus.PROCESSING}
+                    variant="blue"
+                  >
+                    RANDOM
+                  </MinecraftButton>
+                </div>
+
+                <div className="pt-6 border-t-4 border-dashed border-stone-300">
+                  <label className="text-sm uppercase font-black text-stone-500 block mb-2">ADD A REFERENCE (OPTIONAL)</label>
+                  <div 
+                    className="bg-[#f0f0f0] border-4 border-dashed border-stone-400 p-8 text-center cursor-pointer hover:bg-[#e8f5e9] transition-colors"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {previewUrl ? (
+                      <img src={previewUrl} className="max-h-40 mx-auto border-4 border-black" />
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="text-5xl text-stone-400">+</span>
+                        <span className="font-bold text-stone-400">UPLOAD PHOTO</span>
+                      </div>
+                    )}
+                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
                   </div>
-                )}
+                </div>
               </div>
             </MinecraftPanel>
 
-            {/* Output Panel */}
-            <MinecraftPanel title="Output (Result)" className="min-h-[350px] md:min-h-[400px]">
-              <div className="flex flex-col h-full items-center justify-center bg-black/40 border-4 border-stone-800 min-h-[300px] md:min-h-[350px]">
+            <MinecraftPanel title="RESULT CHEST" accent="bg-[#3c8dad]">
+              {/* Brighter Loading State - Avoiding Graying Out */}
+              <div className={`border-4 border-black min-h-[450px] flex items-center justify-center relative overflow-hidden transition-colors duration-500 ${status === AppStatus.PROCESSING ? 'bg-[#FFF9C4]' : 'bg-[#E3F2FD]'}`}>
                 {status === AppStatus.PROCESSING ? (
-                   <div className="text-center">
-                     <div className="w-12 h-12 md:w-16 md:h-16 bg-lime-500 mx-auto animate-spin border-4 border-white mb-4"></div>
-                     <p className="text-yellow-400 animate-pulse">Mining blocks...</p>
-                   </div>
+                  <div className="text-center z-10 p-6">
+                    <div className="w-20 h-20 bg-[#f7d51d] mx-auto animate-spin border-4 border-black mb-8"></div>
+                    <p className="text-[#4da33c] text-3xl font-bold animate-pulse uppercase drop-shadow-[2px_2px_0_#fff]">MINING BLOCKS...</p>
+                    <p className="text-stone-500 text-sm mt-4 italic">Finding the perfect sunlight...</p>
+                  </div>
                 ) : generatedImage ? (
-                  <div className="relative group w-full h-full flex items-center justify-center p-2">
-                    <img src={generatedImage} alt="Minecraftified" className="max-w-full max-h-[300px] md:max-h-[350px] shadow-2xl border-4 border-white" />
-                    {/* Button opacity: 100 on mobile to be always visible, 0 on desktop to show on hover */}
-                    <a 
-                      href={generatedImage} 
-                      download="minecraftified.png"
-                      className="absolute bottom-4 right-4 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white p-2 border-2 border-white shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
-                    >
-                      Download
+                  <div className="p-4 w-full h-full flex flex-col items-center">
+                    <img src={generatedImage} alt="Meme" className="max-w-full shadow-[16px_16px_0_rgba(0,0,0,0.2)] border-4 border-white mb-8" />
+                    <a href={generatedImage} download="minecraft-meme.png" className="w-full">
+                      <MinecraftButton variant="green" className="w-full">SAVE TO INVENTORY</MinecraftButton>
                     </a>
                   </div>
                 ) : (
-                  <div className="text-stone-500 text-center p-8">
-                    <p className="mb-2">No item crafted yet.</p>
-                    <div className="w-10 h-10 md:w-12 md:h-12 bg-stone-800 border-2 border-stone-700 mx-auto opacity-50"></div>
+                  <div className="text-stone-400 text-center uppercase font-black p-12 opacity-40">
+                    <div className="text-8xl mb-6">📦</div>
+                    <p className="text-2xl">EMPTY CHEST</p>
                   </div>
                 )}
               </div>
@@ -321,51 +343,54 @@ const App: React.FC = () => {
         </div>
       </section>
 
-      {/* Tokenomics / Info */}
-      <section id="tokenomics" className="py-10 md:py-20 bg-[#5d4037]">
-        <div className="max-w-6xl mx-auto px-4">
-           <div className="grid md:grid-cols-3 gap-6 md:gap-8 text-center">
-             <MinecraftPanel className="p-6 md:p-8">
-               <h4 className="text-2xl md:text-3xl text-yellow-400 mb-2">Supply</h4>
-               <p className="text-3xl md:text-4xl">1 Billion</p>
-               <p className="text-stone-500 text-sm mt-2">Fixed Supply</p>
-             </MinecraftPanel>
-             <MinecraftPanel className="p-6 md:p-8">
-               <h4 className="text-2xl md:text-3xl text-lime-400 mb-2">Liquidity</h4>
-               <p className="text-3xl md:text-4xl">Burned</p>
-               <p className="text-stone-500 text-sm mt-2">Forever</p>
-             </MinecraftPanel>
-             <MinecraftPanel className="p-6 md:p-8">
-               <h4 className="text-2xl md:text-3xl text-blue-400 mb-2">Tax</h4>
-               <p className="text-3xl md:text-4xl">0/0</p>
-               <p className="text-stone-500 text-sm mt-2">Buy / Sell</p>
-             </MinecraftPanel>
-           </div>
+      {/* Tokenomics / Stats */}
+      <section id="tokenomics" className="py-24 bg-[#4da33c]/90 text-white border-b-8 border-black">
+        <div className="max-w-5xl mx-auto px-4">
+          <h3 className="text-6xl text-center mb-20 font-bold drop-shadow-[6px_6px_0_#000] uppercase tracking-tighter">BANK STATS</h3>
+          <div className="grid md:grid-cols-3 gap-10 text-center">
+            <div className="p-8 border-4 border-black bg-white/20 backdrop-blur-sm">
+              <h4 className="text-[#f7d51d] text-2xl mb-2 font-bold uppercase">SUPPLY</h4>
+              <p className="text-5xl font-black">1 BILLION</p>
+              <p className="text-white/70 text-sm mt-2 font-bold uppercase">Fixed Forever</p>
+            </div>
+            <div className="p-8 border-4 border-black bg-white/20 backdrop-blur-sm">
+              <h4 className="text-[#ff85a1] text-2xl mb-2 font-bold uppercase">FEES</h4>
+              <p className="text-5xl font-black">0% TAX</p>
+              <p className="text-white/70 text-sm mt-2 font-bold uppercase">Safe & Free</p>
+            </div>
+            <div className="p-8 border-4 border-black bg-white/20 backdrop-blur-sm">
+              <h4 className="text-sky-300 text-2xl mb-2 font-bold uppercase">SECURITY</h4>
+              <p className="text-5xl font-black">BURNED</p>
+              <p className="text-white/70 text-sm mt-2 font-bold uppercase">Liquidity Gone</p>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#1a1a1a] border-t-4 border-black py-8 md:py-12 text-center">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl mb-6 md:mb-8">$MINECRAFT</h2>
-          <div className="flex justify-center gap-6 mb-6 md:mb-8">
-            <a 
-              href="https://x.com/i/communities/1999638163858641117" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="bg-white text-black p-3 hover:bg-gray-200 transition-colors border-4 border-gray-400"
-            >
-              <XIcon />
-            </a>
+      <footer className="bg-[#1a1a1a] py-24 text-center border-t-8 border-black text-white relative">
+        <div className="max-w-4xl mx-auto px-6 relative z-10">
+          <div className="flex items-center justify-center gap-4 mb-12">
+            <img src={LOGO_URL} className="w-20 h-20 border-4 border-white shadow-[8px_8px_0_rgba(255,255,255,0.1)]" />
+            <h2 className="text-6xl font-bold tracking-tighter">{TICKER}</h2>
           </div>
-          <p className="text-stone-600 text-sm px-4">
-            $MINECRAFT is a memecoin with no intrinsic value or expectation of financial return. 
-            The coin is for entertainment purposes only. Not affiliated with Mojang or Microsoft.
+          
+          <div className="flex justify-center gap-10 mb-12">
+             <a href={X_LINK} target="_blank" rel="noopener noreferrer" className="bg-white p-5 border-4 border-stone-700 hover:scale-125 transition-transform text-black">
+               <XIcon />
+             </a>
+             <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer" className="bg-white p-5 border-4 border-stone-700 hover:scale-125 transition-transform text-black">
+               <WalletIcon />
+             </a>
+          </div>
+
+          <p className="text-stone-500 text-xl leading-relaxed mb-10 max-w-2xl mx-auto font-bold uppercase">
+            FLYWHEEL PIGGY BANK IS A COMMUNITY DRIVEN MEMECOIN. WE LIKE BLOCKS. WE LIKE PIGS. WE LIKE GAINS. NO INTRINSIC VALUE. JUST VIBES.
           </p>
-          <div className="mt-4 text-stone-800 text-xs font-mono">
-            Build: {process.env.BUILD_TIME || 'Unknown'}
-          </div>
-          <p className="text-stone-700 text-xs mt-4">© 2024 Minecraftification</p>
+          
+          <p className="text-stone-700 text-sm font-mono uppercase tracking-widest font-bold">
+            © 2024 FLYWHEEL PIGGY BANK - NOT AFFILIATED WITH MOJANG
+          </p>
         </div>
       </footer>
     </div>
