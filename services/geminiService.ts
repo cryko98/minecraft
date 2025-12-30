@@ -15,8 +15,8 @@ export const generateMeme = async (
 
     const ai = new GoogleGenAI({ apiKey });
 
-    // Updated system prompt to match the high-quality "Chef Piggy" reference style:
-    // Cinematic, warm lighting, particles, depth of field, RTX/Unreal Engine 5 look.
+    // Updated system prompt to strictly enforce the specific character appearance
+    // defined by the reference image provided by the user.
     const systemPrompt = `Create a STUNNING, MASTERPIECE QUALITY 3D voxel art render (Minecraft style with RTX shaders).
 
     VISUAL STYLE GUIDE:
@@ -24,21 +24,26 @@ export const generateMeme = async (
     - **Lighting**: Warm, golden, magical atmosphere. Use volumetric lighting, bloom, and floating golden dust particles/sparkles/bokeh.
     - **Textures**: High-definition voxel textures. Materials should look tangible (smooth plastic/ceramic for the piggy, realistic wood/stone/metal for environment).
     - **Camera**: Use significant depth of field (bokeh) to blur the background and focus sharply on the character.
-    - **Detail Level**: Extremely high. Adds small details like glowing particles, coin glints, and rich environmental textures.
 
-    MAIN CHARACTER:
-    - A cute, blocky PINK MINECRAFT PIGGY BANK.
-    - IMPORTANT: It has TWO SMALL WHITE WINGS on its back.
-    - It looks heroic, cute, or busy depending on the context.
+    STRICT CHARACTER DEFINITION (THE "FLYWHEEL PIGGY BANK"):
+    You must ALWAYS render the EXACT SAME character in every image.
+    - **Base Model**: A classic Minecraft Pig (cubic body, head, short legs, protruding snout).
+    - **Color**: Vibrant Pig Pink (#F08080) with subtle texture details.
+    - **MANDATORY FEATURE 1 (WINGS)**: The pig MUST have two cute, white, voxelated ANGEL WINGS on its back.
+    - **MANDATORY FEATURE 2 (SLOT)**: A golden coin slot on top of its head (if the top is visible).
+    - **Eyes**: Standard wide-set black pixel eyes (cute expression).
+    - **Snout**: Protruding rectangular pink snout.
+    - **Accessories**: Do not add clothes unless the prompt specifically asks for a costume. The base character is just the winged pig.
 
     SCENE CONTEXT:
     ${prompt}
 
     CRITICAL INSTRUCTION: 
-    - NO TEXT. Do NOT include any text, captions, watermark, or UI elements.
-    - If the user asks for text, only then include it as 3D block text in the scene, otherwise keep it clean.
+    - **CONSISTENCY**: The character must look like the "Flywheel Piggy Bank" described above. Do not change it into a generic pig or a human. It is a blocky, winged piggy bank.
+    - **NO TEXT**: Do NOT include any text, captions, watermark, or UI elements.
+    - **QUALITY**: Make it look like a premium video game promotional art. Vibrant, saturated, and magical.
 
-    Make it look like a premium video game promotional art. Vibrant, saturated, and magical.`;
+    If the user's prompt implies a specific action (e.g., "cooking", "driving"), adapt the character's pose and surroundings, but KEEP THE CHARACTER DESIGN (Pink + Wings) intact.`;
 
     const parts: any[] = [{ text: systemPrompt }];
 
@@ -51,7 +56,7 @@ export const generateMeme = async (
           mimeType: mimeType,
         },
       });
-      parts[0].text += " Use the attached image as a composition reference, but strictly apply the 3D Voxel/Minecraft visual style described above.";
+      parts[0].text += " Use the attached image as a composition/pose reference, but IGNORE the character in the image and REPLACE it with the Flywheel Piggy Bank (Pink Voxel Pig with Wings) described above.";
     }
 
     const response = await ai.models.generateContent({
