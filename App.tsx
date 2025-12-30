@@ -154,6 +154,7 @@ const App: React.FC = () => {
             <a href="#workshop" className="hover:text-[#f7d51d] transition-colors">WORKSHOP</a>
             <a href="#howtobuy" className="hover:text-[#f7d51d] transition-colors">HOW TO BUY</a>
             <a href="#tokenomics" className="hover:text-[#f7d51d] transition-colors">STATS</a>
+            <a href="#chart" className="hover:text-[#f7d51d] transition-colors">CHART</a>
           </div>
           <div className="flex gap-4 items-center">
              <a href={X_LINK} target="_blank" rel="noopener noreferrer" className="bg-white p-2 border-2 border-black hover:bg-sky-100 transition-colors">
@@ -169,15 +170,13 @@ const App: React.FC = () => {
             <a href="#workshop" onClick={() => setIsMenuOpen(false)}>WORKSHOP</a>
             <a href="#howtobuy" onClick={() => setIsMenuOpen(false)}>HOW TO BUY</a>
             <a href="#tokenomics" onClick={() => setIsMenuOpen(false)}>STATS</a>
+            <a href="#chart" onClick={() => setIsMenuOpen(false)}>CHART</a>
           </div>
         )}
       </nav>
 
       {/* Hero Header */}
       <header className="pt-32 pb-20 px-4 text-center relative overflow-hidden">
-        {/* The Sun - Brighter & More Vibrant */}
-        <div className="absolute top-24 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-24 w-32 h-32 bg-[#FFD700] border-4 border-black shadow-[0_0_80px_rgba(255,215,0,0.6)] animate-pulse rounded-none"></div>
-        
         <div className="max-w-5xl mx-auto relative z-10">
           <div className="bg-white/90 p-6 md:p-8 border-4 border-black shadow-[12px_12px_0_rgba(0,0,0,0.1)] relative">
             {/* Top Grass Border */}
@@ -192,7 +191,7 @@ const App: React.FC = () => {
             </h2>
             
             <p className="text-2xl md:text-4xl text-[#3c8dad] mb-12 font-bold drop-shadow-[1px_1px_0_#fff] uppercase">
-              THE BRIGHTEST BANK IN THE BLOCKVERSE
+              FLYWHEEL PIGGY BANK
             </p>
             
             <div className="bg-[#e8f5e9] p-6 border-4 border-black mb-12 max-w-2xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
@@ -387,6 +386,24 @@ const App: React.FC = () => {
               <p className="text-5xl font-black">BURNED</p>
               <p className="text-white/70 text-sm mt-2 font-bold uppercase">Liquidity Gone</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Live Chart Section */}
+      <section id="chart" className="py-24 bg-[#f7d51d]/90 border-b-8 border-black">
+        <div className="max-w-7xl mx-auto px-4">
+          <h3 className="text-5xl md:text-8xl text-center mb-12 text-black font-bold drop-shadow-[4px_4px_0_#fff] uppercase tracking-tighter">
+            LIVE CHART
+          </h3>
+          <div className="minecraft-panel bg-white p-2 border-4 border-black shadow-[12px_12px_0_rgba(0,0,0,0.1)]">
+             <div className="relative w-full pb-[125%] lg:pb-[65%]">
+               <iframe 
+                 src="https://dexscreener.com/solana/CXeknkisKyYMDCHg17z7p37ETVQ4NPW9otQtkARZQViC?embed=1&loadChartSettings=0&chartLeftToolbar=0&chartTheme=dark&theme=light&chartStyle=1&chartType=usd&interval=15"
+                 title="DexScreener Chart"
+                 className="absolute w-full h-full top-0 left-0 border-0"
+               ></iframe>
+             </div>
           </div>
         </div>
       </section>
