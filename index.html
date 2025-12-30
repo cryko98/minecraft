@@ -25,6 +25,14 @@
         box-shadow: inset 4px 4px 0px 0px rgba(255,255,255,0.2), inset -4px -4px 0px 0px rgba(0,0,0,0.5);
         border: 4px solid #000;
       }
+      @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+      .animate-marquee {
+        animation: marquee 40s linear infinite;
+        width: max-content;
+      }
     </style>
   <script type="importmap">
 {

@@ -72,7 +72,7 @@ const App: React.FC = () => {
   const CA = "8TB4mYMMtjbpW9P7KsEupAGBQxk8ipnPJFAH8mVCpump";
   const TICKER = "$BANK";
   const LOGO_URL = "https://pbs.twimg.com/profile_images/2005588300828971008/s-KpyDgj.jpg";
-  const BANNER_URL = "https://c4.wallpaperflare.com/wallpaper/128/632/6/minecraft-digital-video-game-landscape-digital-artist-3d-graphics-hd-wallpaper-thumb.jpg";
+  const BANNER_URL = "https://pbs.twimg.com/profile_banners/2005588227588280320/1767004581/1500x500";
   const X_LINK = "https://x.com/FlyWheelPiggy";
   const PUMP_LINK = `https://pump.fun/coin/${CA}`;
 
@@ -85,6 +85,21 @@ const App: React.FC = () => {
     "Piggy bank wearing a golden crown in a sunny village square",
     "Piggy bank riding a blocky turtle through a coral reef",
     "Piggy bank mining rare blocks under a bright pixel sun"
+  ];
+
+  const marqueeImages = [
+    "https://pbs.twimg.com/media/G9VtHloXwAAKvvU?format=jpg&name=medium",
+    "https://pbs.twimg.com/media/G9aakzNXMAAnxOh?format=jpg&name=medium",
+    "https://pbs.twimg.com/media/G9VsnHJXoAE8JCw?format=jpg&name=medium",
+    "https://pbs.twimg.com/media/G9VrkAyXEAAlmGu?format=jpg&name=medium",
+    "https://pbs.twimg.com/media/G9Vpeh1WwAAwR-E?format=jpg&name=medium",
+    "https://pbs.twimg.com/media/G9VoVglWoAAUbZ6?format=jpg&name=medium",
+    "https://pbs.twimg.com/media/G9Vn_7hWgAAgS43?format=png&name=900x900",
+    "https://pbs.twimg.com/media/G9Vmb1ZXkAEC8r6?format=jpg&name=medium",
+    "https://pbs.twimg.com/media/G9WqJzYWMAEog4Y?format=jpg&name=medium",
+    "https://pbs.twimg.com/media/G9VlVMpXUAAwgCq?format=jpg&name=medium",
+    "https://pbs.twimg.com/media/G9VhIpCWoAAzXKJ?format=jpg&name=medium",
+    "https://pbs.twimg.com/media/G9VaAKAWkAAMkb_?format=jpg&name=medium"
   ];
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -203,6 +218,15 @@ const App: React.FC = () => {
           </div>
         </div>
       </header>
+
+      {/* Infinite Meme Marquee */}
+      <div className="bg-[#1a1a1a] border-y-8 border-black py-4 overflow-hidden relative">
+        <div className="flex w-max animate-marquee gap-6 hover:pause">
+           {[...marqueeImages, ...marqueeImages].map((src, idx) => (
+               <img key={idx} src={src} className="h-64 w-64 object-cover border-4 border-white shadow-[8px_8px_0_rgba(255,255,255,0.2)]" alt="Meme" />
+           ))}
+        </div>
+      </div>
 
       {/* How to Buy on Pump.fun Section */}
       <section id="howtobuy" className="py-24 px-4 bg-[#3c8dad]/90 border-y-8 border-black">

@@ -15,15 +15,30 @@ export const generateMeme = async (
 
     const ai = new GoogleGenAI({ apiKey });
 
-    // Cheerful system prompt focusing on bright, funny Minecraft voxel art
-    const systemPrompt = `Create a high-quality 3D Minecraft-style voxel art meme. 
-    STYLE: Strictly blocky, pixelated, but with EXTREMELY bright, cheerful, 'Overworld' sunlight lighting. Vibrant saturated colors.
-    MAIN CHARACTER: A cute, blocky, pink voxel piggy bank with a golden coin slot AND TWO WHITE WINGS on its back. The winged piggy should look happy, funny, and heroic.
-    THEME: Flywheel Piggy Bank ($BANK) on Solana.
-    CONTEXT: ${prompt}. 
-    Make it look like a high-end 3D render from a modern Minecraft cinematic (like Raytracing/RTX style). 
-    Avoid dark, gloomy, or gray tones. Everything should be sunny and fun.
-    If there's a reference image, turn the scene/person in that image into a Minecraft voxel version of themselves alongside the winged piggy.`;
+    // Updated system prompt to match the high-quality "Chef Piggy" reference style:
+    // Cinematic, warm lighting, particles, depth of field, RTX/Unreal Engine 5 look.
+    const systemPrompt = `Create a STUNNING, MASTERPIECE QUALITY 3D voxel art render (Minecraft style with RTX shaders).
+
+    VISUAL STYLE GUIDE:
+    - **Render Engine Look**: Unreal Engine 5, Octane Render, or Blender Cycles with high-end cinematic settings.
+    - **Lighting**: Warm, golden, magical atmosphere. Use volumetric lighting, bloom, and floating golden dust particles/sparkles/bokeh.
+    - **Textures**: High-definition voxel textures. Materials should look tangible (smooth plastic/ceramic for the piggy, realistic wood/stone/metal for environment).
+    - **Camera**: Use significant depth of field (bokeh) to blur the background and focus sharply on the character.
+    - **Detail Level**: Extremely high. Adds small details like glowing particles, coin glints, and rich environmental textures.
+
+    MAIN CHARACTER:
+    - A cute, blocky PINK MINECRAFT PIGGY BANK.
+    - IMPORTANT: It has TWO SMALL WHITE WINGS on its back.
+    - It looks heroic, cute, or busy depending on the context.
+
+    SCENE CONTEXT:
+    ${prompt}
+
+    CRITICAL INSTRUCTION: 
+    - NO TEXT. Do NOT include any text, captions, watermark, or UI elements.
+    - If the user asks for text, only then include it as 3D block text in the scene, otherwise keep it clean.
+
+    Make it look like a premium video game promotional art. Vibrant, saturated, and magical.`;
 
     const parts: any[] = [{ text: systemPrompt }];
 
@@ -36,7 +51,7 @@ export const generateMeme = async (
           mimeType: mimeType,
         },
       });
-      parts[0].text += " Use the attached image as a direct reference to 'Minecraft-ify' the scene.";
+      parts[0].text += " Use the attached image as a composition reference, but strictly apply the 3D Voxel/Minecraft visual style described above.";
     }
 
     const response = await ai.models.generateContent({
