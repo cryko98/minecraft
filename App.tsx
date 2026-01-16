@@ -1,7 +1,5 @@
 
-import React, { useState, useRef } from 'react';
-import { generateMeme } from './services/geminiService';
-import { AppStatus } from './types';
+import React, { useState, useEffect, useRef } from 'react';
 
 // Icons
 const XIcon = () => (
@@ -10,128 +8,124 @@ const XIcon = () => (
   </svg>
 );
 
-const MenuIcon = () => (
+const CopyIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-    <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
   </svg>
 );
 
-const WalletIcon = () => (
+const ChartIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-    <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M16 8h2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M20 12h-4"/>
+    <line x1="12" y1="20" x2="12" y2="10"></line>
+    <line x1="18" y1="20" x2="18" y2="4"></line>
+    <line x1="6" y1="20" x2="6" y2="16"></line>
   </svg>
 );
 
-const MinecraftButton: React.FC<{ 
+const HandButton: React.FC<{ 
   onClick?: () => void; 
-  disabled?: boolean; 
   children: React.ReactNode; 
   className?: string; 
-  variant?: 'gray' | 'green' | 'blue' | 'pink' | 'yellow';
-}> = ({ onClick, disabled, children, className = '', variant = 'gray' }) => {
-  let baseColor = 'bg-stone-400';
-  if (variant === 'green') baseColor = 'bg-[#4da33c] hover:bg-[#5ebc4a] text-white';
-  if (variant === 'blue') baseColor = 'bg-[#3c8dad] hover:bg-[#4ea6c9] text-white';
-  if (variant === 'pink') baseColor = 'bg-[#ff85a1] hover:bg-[#ff99b1] text-white';
-  if (variant === 'yellow') baseColor = 'bg-[#f7d51d] hover:bg-[#ffe042] text-black';
-  
+}> = ({ onClick, children, className = '' }) => {
   return (
     <button
       onClick={onClick}
-      disabled={disabled}
-      className={`minecraft-btn relative px-6 py-3 font-bold text-xl uppercase tracking-widest ${baseColor} border-4 border-black disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all shadow-[4px_4px_0_rgba(0,0,0,1)] ${className}`}
+      className={`hand-drawn-border bg-white text-black px-6 py-3 text-xl font-bold uppercase cursor-pointer ${className}`}
     >
       {children}
     </button>
   );
 };
 
-const MinecraftPanel: React.FC<{ children: React.ReactNode; className?: string; title?: string; accent?: string }> = ({ children, className = '', title, accent = 'bg-stone-500' }) => (
-  <div className={`minecraft-panel bg-[#d1d1d1] p-1 border-4 border-black shadow-[8px_8px_0_rgba(0,0,0,0.1)] ${className}`}>
-    {title && (
-      <div className={`${accent} text-white px-3 py-2 mb-2 border-b-4 border-black text-xl uppercase font-bold tracking-tighter`}>
-        {title}
-      </div>
-    )}
-    <div className="bg-[#e2e2e2] p-4 h-full border-2 border-white/50">
-      {children}
-    </div>
+const PaperCard: React.FC<{ children: React.ReactNode; className?: string; rotate?: string }> = ({ children, className = '', rotate = 'rotate-0' }) => (
+  <div className={`bg-[#fdfdfd] text-black p-6 hand-drawn-border ${rotate} ${className}`}>
+    {children}
   </div>
 );
 
+// Unstable Chart Background Component
+const UnstableChartBackground: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    let points: number[] = [];
+    const speed = 2; // Speed of scrolling
+    const segmentWidth = 5; // Width between points
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      // Initialize points to fill screen
+      const numPoints = Math.ceil(canvas.width / segmentWidth) + 2;
+      points = new Array(numPoints).fill(canvas.height / 2);
+    };
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const animate = () => {
+      // Create a jagged, unstable movement for the new point
+      const lastPoint = points[points.length - 1];
+      const volatility = 30; // How much it jumps up/down
+      let nextPoint = lastPoint + (Math.random() - 0.5) * volatility;
+
+      // Keep it somewhat within screen bounds (with padding)
+      if (nextPoint < 50) nextPoint = 50 + Math.random() * 20;
+      if (nextPoint > canvas.height - 50) nextPoint = canvas.height - 50 - Math.random() * 20;
+
+      // Add new point, remove old
+      points.push(nextPoint);
+      points.shift();
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw the line
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; // White, semi-transparent
+      ctx.lineWidth = 3;
+      ctx.lineJoin = 'round';
+
+      for (let i = 0; i < points.length; i++) {
+        const x = i * segmentWidth;
+        const y = points[i];
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return (
+    <canvas 
+      ref={canvasRef} 
+      className="fixed inset-0 pointer-events-none z-0"
+    />
+  );
+};
+
 const App: React.FC = () => {
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [prompt, setPrompt] = useState('');
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const [status, setStatus] = useState<AppStatus>(AppStatus.IDLE);
-  const [errorMessage, setErrorMessage] = useState<string>('');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const CA = "8TB4mYMMtjbpW9P7KsEupAGBQxk8ipnPJFAH8mVCpump";
-  const TICKER = "$BANK";
-  const LOGO_URL = "https://pbs.twimg.com/profile_images/2005588300828971008/s-KpyDgj.jpg";
-  const BANNER_URL = "https://pbs.twimg.com/profile_banners/2005588227588280320/1767004581/1500x500";
-  const X_LINK = "https://x.com/FlyWheelPiggy";
+  const CA = "3vz82EWYv8xnc7Cm7qSgERcpMeqw92PcX8PBz88npump";
+  const TICKER = "$USDUT";
+  const LOGO_URL = "https://pbs.twimg.com/profile_images/1960730761067163648/Jo0qh4hm_400x400.jpg";
+  const X_LINK = "https://x.com/usdutcto?s=21";
   const PUMP_LINK = `https://pump.fun/coin/${CA}`;
-
-  const randomMemes = [
-    "Piggy bank sitting on a throne of diamond blocks like a king",
-    "Piggy bank flying a blocky helicopter over a sunny meadow",
-    "Piggy bank holding a giant golden $BANK coin",
-    "Piggy bank driving a voxel sports car through a bright desert",
-    "Piggy bank swimming in a sea of emerald blocks",
-    "Piggy bank wearing a golden crown in a sunny village square",
-    "Piggy bank riding a blocky turtle through a coral reef",
-    "Piggy bank mining rare blocks under a bright pixel sun"
-  ];
-
-  const marqueeImages = [
-    "https://pbs.twimg.com/media/G9VtHloXwAAKvvU?format=jpg&name=medium",
-    "https://pbs.twimg.com/media/G9aakzNXMAAnxOh?format=jpg&name=medium",
-    "https://pbs.twimg.com/media/G9VsnHJXoAE8JCw?format=jpg&name=medium",
-    "https://pbs.twimg.com/media/G9VrkAyXEAAlmGu?format=jpg&name=medium",
-    "https://pbs.twimg.com/media/G9Vpeh1WwAAwR-E?format=jpg&name=medium",
-    "https://pbs.twimg.com/media/G9VoVglWoAAUbZ6?format=jpg&name=medium",
-    "https://pbs.twimg.com/media/G9Vn_7hWgAAgS43?format=png&name=900x900",
-    "https://pbs.twimg.com/media/G9Vmb1ZXkAEC8r6?format=jpg&name=medium",
-    "https://pbs.twimg.com/media/G9WqJzYWMAEog4Y?format=jpg&name=medium",
-    "https://pbs.twimg.com/media/G9VlVMpXUAAwgCq?format=jpg&name=medium",
-    "https://pbs.twimg.com/media/G9VhIpCWoAAzXKJ?format=jpg&name=medium",
-    "https://pbs.twimg.com/media/G9VaAKAWkAAMkb_?format=jpg&name=medium"
-  ];
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      setFile(selectedFile);
-      const reader = new FileReader();
-      reader.onloadend = () => setPreviewUrl(reader.result as string);
-      reader.readAsDataURL(selectedFile);
-    }
-  };
-
-  const generateMemeAction = async (customPrompt?: string) => {
-    const finalPrompt = customPrompt || prompt || "A very happy blocky piggy bank in a sunny world";
-    setStatus(AppStatus.PROCESSING);
-    setErrorMessage('');
-    try {
-      const result = await generateMeme(finalPrompt, previewUrl || undefined, file?.type);
-      setGeneratedImage(result);
-      setStatus(AppStatus.SUCCESS);
-    } catch (error: any) {
-      console.error(error);
-      setStatus(AppStatus.ERROR);
-      setErrorMessage(error.message || 'Crafting failed.');
-    }
-  };
-
-  const handleRandom = () => {
-    const random = randomMemes[Math.floor(Math.random() * randomMemes.length)];
-    setPrompt(random);
-    generateMemeAction(random);
-  };
+  const DEX_LINK = `https://dexscreener.com/solana/${CA}`;
 
   const copyCA = () => {
     navigator.clipboard.writeText(CA);
@@ -139,267 +133,154 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen text-black overflow-x-hidden selection:bg-[#f7d51d] selection:text-black relative">
-      {/* Background Image */}
-      <div className="fixed inset-0 -z-10 bg-[url('https://cdn.wallpapersafari.com/83/14/NKVgFh.jpg')] bg-cover bg-center bg-no-repeat bg-fixed"></div>
-      
+    <div className="min-h-screen text-black overflow-x-hidden relative bg-[#50bda3]">
+      {/* Texture Overlay for Paper Feel */}
+      <div className="fixed inset-0 opacity-10 pointer-events-none z-10" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/crumpled-paper.png")' }}></div>
+
+      {/* Animated Unstable Background */}
+      <UnstableChartBackground />
+
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#4da33c] border-b-4 border-black p-4 shadow-lg">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <nav className="fixed top-0 left-0 right-0 z-50 p-4">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-sm border-2 border-black rounded-xl px-6 py-3 shadow-[4px_4px_0_rgba(0,0,0,1)] gap-4 md:gap-0">
           <div className="flex items-center gap-3">
-            <img src={LOGO_URL} alt="Logo" className="w-12 h-12 border-4 border-black object-cover" />
-            <h1 className="text-3xl text-white drop-shadow-[4px_4px_0_rgba(0,0,0,1)] font-bold tracking-tighter">FLYWHEEL PIGGY BANK</h1>
+            <img src={LOGO_URL} alt="Logo" className="w-10 h-10 rounded-full border-2 border-black" />
+            <h1 className="text-xl md:text-2xl font-bold tracking-wider">{TICKER}</h1>
           </div>
-          <div className="hidden md:flex gap-8 text-xl text-white font-bold">
-            <a href="#workshop" className="hover:text-[#f7d51d] transition-colors">WORKSHOP</a>
-            <a href="#howtobuy" className="hover:text-[#f7d51d] transition-colors">HOW TO BUY</a>
-            <a href="#tokenomics" className="hover:text-[#f7d51d] transition-colors">STATS</a>
-            <a href="#chart" className="hover:text-[#f7d51d] transition-colors">CHART</a>
+          
+          {/* Quick Links */}
+          <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-lg font-bold font-hand">
+            <a href="#manifesto" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">MANIFESTO</a>
+            <a href="#stats" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">STATS</a>
+            <a href="#chart" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">CHART</a>
+            <a href="#buy" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">BUY</a>
           </div>
+
           <div className="flex gap-4 items-center">
-             <a href={X_LINK} target="_blank" rel="noopener noreferrer" className="bg-white p-2 border-2 border-black hover:bg-sky-100 transition-colors">
+             <a href={X_LINK} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform">
                <XIcon />
              </a>
-             <button className="md:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-               <MenuIcon />
-             </button>
+             <a href={DEX_LINK} target="_blank" rel="noopener noreferrer" className="bg-black text-white px-4 py-1 rounded-full font-bold hover:bg-gray-800 transition-colors">
+               CHART
+             </a>
           </div>
         </div>
-        {isMenuOpen && (
-          <div className="md:hidden bg-[#4da33c] border-t-4 border-black p-6 flex flex-col gap-4 text-white text-2xl font-bold">
-            <a href="#workshop" onClick={() => setIsMenuOpen(false)}>WORKSHOP</a>
-            <a href="#howtobuy" onClick={() => setIsMenuOpen(false)}>HOW TO BUY</a>
-            <a href="#tokenomics" onClick={() => setIsMenuOpen(false)}>STATS</a>
-            <a href="#chart" onClick={() => setIsMenuOpen(false)}>CHART</a>
-          </div>
-        )}
       </nav>
 
       {/* Hero Header */}
-      <header className="pt-32 pb-20 px-4 text-center relative overflow-hidden">
-        <div className="max-w-5xl mx-auto relative z-10">
-          <div className="bg-white/90 p-6 md:p-8 border-4 border-black shadow-[12px_12px_0_rgba(0,0,0,0.1)] relative">
-            {/* Top Grass Border */}
-            <div className="absolute top-0 left-0 right-0 h-4 bg-[#5ebc4a] border-b-2 border-black/20"></div>
-            
-            <div className="mt-4 mb-8">
-              <img src={BANNER_URL} alt="Minecraft World Banner" className="w-full h-auto max-h-[300px] object-cover border-4 border-black shadow-[4px_4px_0_#000]" />
-            </div>
-            
-            <h2 className="text-6xl md:text-9xl mb-4 text-black font-bold drop-shadow-[4px_4px_0_#fff] leading-tight uppercase tracking-tighter">
-              {TICKER}
-            </h2>
-            
-            <p className="text-2xl md:text-4xl text-[#3c8dad] mb-12 font-bold drop-shadow-[1px_1px_0_#fff] uppercase">
-              FLYWHEEL PIGGY BANK
-            </p>
-            
-            <div className="bg-[#e8f5e9] p-6 border-4 border-black mb-12 max-w-2xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="text-left w-full">
-                <span className="text-xs uppercase text-stone-500 font-bold block mb-1">OFFICIAL VAULT (CA)</span>
-                <code className="text-black break-all text-sm md:text-xl font-mono font-bold">{CA}</code>
-              </div>
-              <MinecraftButton variant="yellow" className="w-full md:w-auto py-2 px-8 text-sm" onClick={copyCA}>
-                COPY
-              </MinecraftButton>
-            </div>
+      <header id="buy" className="pt-40 pb-12 px-4 text-center relative z-20">
+        <div className="max-w-4xl mx-auto flex flex-col items-center">
+          
+          <div className="relative mb-8 group">
+            <div className="absolute inset-0 bg-black rounded-full transform translate-x-2 translate-y-2 group-hover:translate-x-3 group-hover:translate-y-3 transition-transform"></div>
+            <img 
+              src={LOGO_URL} 
+              alt="Unstable Tether Logo" 
+              className="relative w-48 h-48 md:w-64 md:h-64 rounded-full border-4 border-black object-cover wobble z-10" 
+            />
+          </div>
+          
+          <h1 className="text-6xl md:text-9xl mb-2 text-white font-bold drop-shadow-[4px_4px_0_#000] transform -rotate-2">
+            UNSTABLE TETHER
+          </h1>
+          
+          <p className="text-2xl md:text-3xl text-white mb-8 font-bold tracking-widest bg-black inline-block px-4 py-1 transform rotate-1 border-2 border-white">
+            1 USDUT = 1 USDUT (MAYBE)
+          </p>
+          
+          <div className="bg-white p-4 border-4 border-black mb-8 w-full max-w-2xl transform -rotate-1 shadow-[8px_8px_0_rgba(0,0,0,0.2)]">
+             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <code className="text-sm md:text-xl font-bold break-all">{CA}</code>
+                <HandButton onClick={copyCA} className="bg-[#f7d51d] hover:bg-[#ffe042] text-sm py-2">
+                  <span className="flex items-center gap-2"><CopyIcon /> COPY</span>
+                </HandButton>
+             </div>
+          </div>
 
-            <div className="flex flex-col md:flex-row justify-center gap-6">
-              <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer" className="w-full md:w-72">
-                <MinecraftButton variant="green" className="w-full">
-                  BUY ON PUMP.FUN
-                </MinecraftButton>
-              </a>
-              <MinecraftButton variant="blue" className="w-full md:w-72">
+          <div className="flex flex-wrap justify-center gap-6">
+            <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer">
+              <HandButton className="bg-[#ff85a1] hover:bg-[#ff99b1] transform rotate-1">
+                BUY ON PUMP.FUN
+              </HandButton>
+            </a>
+            <a href={DEX_LINK} target="_blank" rel="noopener noreferrer">
+              <HandButton className="bg-white hover:bg-gray-100 transform -rotate-1">
                 DEXSCREENER
-              </MinecraftButton>
-            </div>
+              </HandButton>
+            </a>
           </div>
         </div>
       </header>
 
-      {/* Infinite Meme Marquee */}
-      <div className="bg-[#1a1a1a] border-y-8 border-black py-4 overflow-hidden relative">
-        <div className="flex w-max animate-marquee gap-6 hover:pause">
-           {[...marqueeImages, ...marqueeImages].map((src, idx) => (
-               <img key={idx} src={src} className="h-64 w-64 object-cover border-4 border-white shadow-[8px_8px_0_rgba(255,255,255,0.2)]" alt="Meme" />
-           ))}
-        </div>
-      </div>
+      {/* Handwritten Story Section */}
+      <section id="manifesto" className="py-20 px-4 relative z-20">
+        <div className="max-w-3xl mx-auto">
+          <PaperCard rotate="rotate-1" className="bg-[#fffbeb]">
+            <h2 className="text-4xl md:text-5xl mb-6 text-center transform -rotate-2 underline decoration-wavy decoration-teal-500">
+              The Manifesto
+            </h2>
+            
+            <div className="flex justify-center mb-8">
+              <img 
+                src="https://pbs.twimg.com/media/GzoYVH9WwAASDbt?format=jpg&name=large" 
+                alt="Unstable Tether Meme" 
+                className="w-full max-w-lg rounded-lg border-4 border-black transform rotate-1 shadow-[6px_6px_0_rgba(0,0,0,0.2)] hover:scale-105 transition-transform duration-300"
+              />
+            </div>
 
-      {/* How to Buy on Pump.fun Section */}
-      <section id="howtobuy" className="py-24 px-4 bg-[#3c8dad]/90 border-y-8 border-black">
+            <div className="text-2xl md:text-3xl space-y-6 leading-relaxed font-hand">
+              <p>
+                Hi. We are <span className="font-bold text-teal-600">Unstable Tether</span>.
+              </p>
+              <p>
+                Unlike other stablecoins that promise you $1.00 and give you anxiety, we promise you nothing and give you vibes.
+              </p>
+              <p>
+                We are fully audited by "Trust Me Bro LLC". Our reserves are backed by hopes, dreams, and a half-eaten sandwich I found earlier.
+              </p>
+              <p className="text-center font-bold text-4xl mt-8 transform rotate-1">
+                STAY UNSTABLE.
+              </p>
+            </div>
+          </PaperCard>
+        </div>
+      </section>
+
+      {/* Stats (Hand drawn style) */}
+      <section id="stats" className="py-10 px-4 relative z-20">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8">
+            <PaperCard rotate="-rotate-2" className="text-center bg-white">
+              <div className="text-5xl mb-2">💸</div>
+              <h3 className="text-2xl font-bold">Total Supply</h3>
+              <p className="text-4xl font-black mt-2">1 Billion</p>
+            </PaperCard>
+            
+            <PaperCard rotate="rotate-2" className="text-center bg-white">
+              <div className="text-5xl mb-2">🔥</div>
+              <h3 className="text-2xl font-bold">Liquidity</h3>
+              <p className="text-4xl font-black mt-2">Burnt</p>
+            </PaperCard>
+            
+            <PaperCard rotate="-rotate-1" className="text-center bg-white">
+              <div className="text-5xl mb-2">📉</div>
+              <h3 className="text-2xl font-bold">Peg Status</h3>
+              <p className="text-4xl font-black mt-2">Unstable</p>
+            </PaperCard>
+          </div>
+        </div>
+      </section>
+
+      {/* Chart Section */}
+      <section id="chart" className="py-20 px-4 relative z-20">
         <div className="max-w-6xl mx-auto">
-          <h3 className="text-5xl md:text-7xl text-center mb-20 text-white drop-shadow-[6px_6px_0_#000] font-bold uppercase tracking-tighter">
-            HOW TO JOIN THE VAULT
-          </h3>
-          
-          <div className="grid md:grid-cols-4 gap-8">
-            <MinecraftPanel title="1. CRAFT WALLET" accent="bg-[#4da33c]">
-              <div className="text-center">
-                <div className="text-5xl mb-4">🦊</div>
-                <p className="text-lg font-bold">Download Phantom or Solflare. This is your personal inventory for {TICKER}.</p>
-              </div>
-            </MinecraftPanel>
-            
-            <MinecraftPanel title="2. MINE SOL" accent="bg-[#f7d51d]">
-              <div className="text-center">
-                <div className="text-5xl mb-4">💎</div>
-                <p className="text-lg font-bold text-black">Fill your wallet with SOL from any exchange. You need it to swap for the good stuff.</p>
-              </div>
-            </MinecraftPanel>
-            
-            <MinecraftPanel title="3. PUMP.FUN" accent="bg-[#ff85a1]">
-              <div className="text-center">
-                <div className="text-5xl mb-4">🍄</div>
-                <p className="text-lg font-bold">Head over to Pump.fun and paste our CA into the search bar. Look for the Piggy!</p>
-              </div>
-            </MinecraftPanel>
-            
-            <MinecraftPanel title="4. SWAP & HODL" accent="bg-[#4da33c]">
-              <div className="text-center">
-                <div className="text-5xl mb-4">🐷</div>
-                <p className="text-lg font-bold">Swap your SOL for {TICKER}. Sit back and watch the bank grow!</p>
-              </div>
-            </MinecraftPanel>
-          </div>
-
-          <div className="mt-16 text-center">
-            <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer">
-              <MinecraftButton variant="yellow" className="animate-pulse px-12 py-6 text-2xl">
-                OPEN PUMP.FUN NOW
-              </MinecraftButton>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Meme Workshop Section */}
-      <section id="workshop" className="py-24 px-4 bg-white/90 border-b-8 border-black relative overflow-hidden">
-        {/* Decorative Pixel Grass */}
-        <div className="absolute top-0 left-0 right-0 h-10 bg-[#5ebc4a] border-b-4 border-black"></div>
-        
-        <div className="max-w-5xl mx-auto mt-16">
-          <div className="text-center mb-20">
-            <h3 className="text-5xl md:text-8xl mb-6 text-black font-bold drop-shadow-[4px_4px_0_#f7d51d] uppercase tracking-tighter">
-              MEME CRAFTER
-            </h3>
-            <p className="text-2xl text-[#3c8dad] font-bold uppercase">GENERATE SUNNY {TICKER} MEMES</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-12">
-            <MinecraftPanel title="CRAFTING SLOTS" accent="bg-[#4da33c]">
-              <div className="flex flex-col gap-6">
-                <div className="flex flex-col gap-2">
-                  <label className="text-sm uppercase font-black text-stone-500">WHAT'S THE PIGGY DOING?</label>
-                  <textarea 
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="Describe a happy sunny scene..."
-                    className="w-full bg-[#f9f9f9] border-4 border-black p-4 text-xl font-mono focus:outline-none focus:ring-4 ring-[#f7d51d] h-40 resize-none"
-                  />
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <MinecraftButton 
-                    onClick={() => generateMemeAction()} 
-                    disabled={status === AppStatus.PROCESSING}
-                    variant="pink"
-                    className="flex-1"
-                  >
-                    {status === AppStatus.PROCESSING ? 'CRAFTING...' : 'MINT MEME'}
-                  </MinecraftButton>
-                  <MinecraftButton 
-                    onClick={handleRandom} 
-                    disabled={status === AppStatus.PROCESSING}
-                    variant="blue"
-                  >
-                    RANDOM
-                  </MinecraftButton>
-                </div>
-
-                <div className="pt-6 border-t-4 border-dashed border-stone-300">
-                  <label className="text-sm uppercase font-black text-stone-500 block mb-2">ADD A REFERENCE (OPTIONAL)</label>
-                  <div 
-                    className="bg-[#f0f0f0] border-4 border-dashed border-stone-400 p-8 text-center cursor-pointer hover:bg-[#e8f5e9] transition-colors"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    {previewUrl ? (
-                      <img src={previewUrl} className="max-h-40 mx-auto border-4 border-black" />
-                    ) : (
-                      <div className="flex flex-col items-center gap-2">
-                        <span className="text-5xl text-stone-400">+</span>
-                        <span className="font-bold text-stone-400">UPLOAD PHOTO</span>
-                      </div>
-                    )}
-                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
-                  </div>
-                </div>
-              </div>
-            </MinecraftPanel>
-
-            <MinecraftPanel title="RESULT CHEST" accent="bg-[#3c8dad]">
-              {/* Brighter Loading State - Avoiding Graying Out */}
-              <div className={`border-4 border-black min-h-[450px] flex items-center justify-center relative overflow-hidden transition-colors duration-500 ${status === AppStatus.PROCESSING ? 'bg-[#FFF9C4]' : 'bg-[#E3F2FD]'}`}>
-                {status === AppStatus.PROCESSING ? (
-                  <div className="text-center z-10 p-6">
-                    <div className="w-20 h-20 bg-[#f7d51d] mx-auto animate-spin border-4 border-black mb-8"></div>
-                    <p className="text-[#4da33c] text-3xl font-bold animate-pulse uppercase drop-shadow-[2px_2px_0_#fff]">MINING BLOCKS...</p>
-                    <p className="text-stone-500 text-sm mt-4 italic">Finding the perfect sunlight...</p>
-                  </div>
-                ) : generatedImage ? (
-                  <div className="p-4 w-full h-full flex flex-col items-center">
-                    <img src={generatedImage} alt="Meme" className="max-w-full shadow-[16px_16px_0_rgba(0,0,0,0.2)] border-4 border-white mb-8" />
-                    <a href={generatedImage} download="minecraft-meme.png" className="w-full">
-                      <MinecraftButton variant="green" className="w-full">SAVE TO INVENTORY</MinecraftButton>
-                    </a>
-                  </div>
-                ) : (
-                  <div className="text-stone-400 text-center uppercase font-black p-12 opacity-40">
-                    <div className="text-8xl mb-6">📦</div>
-                    <p className="text-2xl">EMPTY CHEST</p>
-                  </div>
-                )}
-              </div>
-            </MinecraftPanel>
-          </div>
-        </div>
-      </section>
-
-      {/* Tokenomics / Stats */}
-      <section id="tokenomics" className="py-24 bg-[#4da33c]/90 text-white border-b-8 border-black">
-        <div className="max-w-5xl mx-auto px-4">
-          <h3 className="text-6xl text-center mb-20 font-bold drop-shadow-[6px_6px_0_#000] uppercase tracking-tighter">BANK STATS</h3>
-          <div className="grid md:grid-cols-3 gap-10 text-center">
-            <div className="p-8 border-4 border-black bg-white/20 backdrop-blur-sm">
-              <h4 className="text-[#f7d51d] text-2xl mb-2 font-bold uppercase">SUPPLY</h4>
-              <p className="text-5xl font-black">1 BILLION</p>
-              <p className="text-white/70 text-sm mt-2 font-bold uppercase">Fixed Forever</p>
-            </div>
-            <div className="p-8 border-4 border-black bg-white/20 backdrop-blur-sm">
-              <h4 className="text-[#ff85a1] text-2xl mb-2 font-bold uppercase">FEES</h4>
-              <p className="text-5xl font-black">0% TAX</p>
-              <p className="text-white/70 text-sm mt-2 font-bold uppercase">Safe & Free</p>
-            </div>
-            <div className="p-8 border-4 border-black bg-white/20 backdrop-blur-sm">
-              <h4 className="text-sky-300 text-2xl mb-2 font-bold uppercase">SECURITY</h4>
-              <p className="text-5xl font-black">BURNED</p>
-              <p className="text-white/70 text-sm mt-2 font-bold uppercase">Liquidity Gone</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Live Chart Section */}
-      <section id="chart" className="py-24 bg-[#f7d51d]/90 border-b-8 border-black">
-        <div className="max-w-7xl mx-auto px-4">
-          <h3 className="text-5xl md:text-8xl text-center mb-12 text-black font-bold drop-shadow-[4px_4px_0_#fff] uppercase tracking-tighter">
+          <h2 className="text-5xl md:text-7xl text-center mb-10 text-white font-bold drop-shadow-[4px_4px_0_#000]">
             LIVE CHART
-          </h3>
-          <div className="minecraft-panel bg-white p-2 border-4 border-black shadow-[12px_12px_0_rgba(0,0,0,0.1)]">
-             <div className="relative w-full pb-[125%] lg:pb-[65%]">
+          </h2>
+          <div className="border-4 border-black bg-white p-2 shadow-[12px_12px_0_rgba(0,0,0,0.2)] transform rotate-1">
+             <div className="relative w-full pb-[65%]">
                <iframe 
-                 src="https://dexscreener.com/solana/CXeknkisKyYMDCHg17z7p37ETVQ4NPW9otQtkARZQViC?embed=1&loadChartSettings=0&chartLeftToolbar=0&chartTheme=dark&theme=light&chartStyle=1&chartType=usd&interval=15"
+                 src={`https://dexscreener.com/solana/${CA}?embed=1&loadChartSettings=0&chartLeftToolbar=0&chartTheme=light&theme=light&chartStyle=1&chartType=usd&interval=15`}
                  title="DexScreener Chart"
                  className="absolute w-full h-full top-0 left-0 border-0"
                ></iframe>
@@ -409,30 +290,21 @@ const App: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#1a1a1a] py-24 text-center border-t-8 border-black text-white relative">
-        <div className="max-w-4xl mx-auto px-6 relative z-10">
-          <div className="flex items-center justify-center gap-4 mb-12">
-            <img src={LOGO_URL} className="w-20 h-20 border-4 border-white shadow-[8px_8px_0_rgba(255,255,255,0.1)]" />
-            <h2 className="text-6xl font-bold tracking-tighter">{TICKER}</h2>
-          </div>
-          
-          <div className="flex justify-center gap-10 mb-12">
-             <a href={X_LINK} target="_blank" rel="noopener noreferrer" className="bg-white p-5 border-4 border-stone-700 hover:scale-125 transition-transform text-black">
-               <XIcon />
-             </a>
-             <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer" className="bg-white p-5 border-4 border-stone-700 hover:scale-125 transition-transform text-black">
-               <WalletIcon />
-             </a>
-          </div>
-
-          <p className="text-stone-500 text-xl leading-relaxed mb-10 max-w-2xl mx-auto font-bold uppercase">
-            FLYWHEEL PIGGY BANK IS A COMMUNITY DRIVEN MEMECOIN. WE LIKE BLOCKS. WE LIKE PIGS. WE LIKE GAINS. NO INTRINSIC VALUE. JUST VIBES.
-          </p>
-          
-          <p className="text-stone-700 text-sm font-mono uppercase tracking-widest font-bold">
-            © 2024 FLYWHEEL PIGGY BANK - NOT AFFILIATED WITH MOJANG
-          </p>
+      <footer className="py-12 text-center text-white/80 relative z-20">
+        <div className="flex justify-center gap-8 mb-8">
+           <a href={X_LINK} target="_blank" rel="noopener noreferrer" className="text-white hover:text-black transition-colors transform hover:scale-125">
+             <XIcon />
+           </a>
+           <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer" className="text-white hover:text-black transition-colors transform hover:scale-125">
+             <ChartIcon />
+           </a>
         </div>
+        <p className="text-xl font-bold">
+          $USDUT is a memecoin with no intrinsic value or expectation of financial return.
+        </p>
+        <p className="mt-2 text-sm opacity-60">
+          (But it's funny though)
+        </p>
       </footer>
     </div>
   );
