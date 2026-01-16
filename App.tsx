@@ -23,6 +23,21 @@ const ChartIcon = () => (
   </svg>
 );
 
+const DownloadIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+    <polyline points="7 10 12 15 17 10"></polyline>
+    <line x1="12" y1="15" x2="12" y2="3"></line>
+  </svg>
+);
+
+const TrashIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+    <polyline points="3 6 5 6 21 6"></polyline>
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+  </svg>
+);
+
 const HandButton: React.FC<{ 
   onClick?: () => void; 
   children: React.ReactNode; 
@@ -56,7 +71,6 @@ const UnstableChartBackground: React.FC = () => {
 
     let animationFrameId: number;
     let points: number[] = [];
-    const speed = 2; // Speed of scrolling
     const segmentWidth = 5; // Width between points
 
     const resizeCanvas = () => {
@@ -119,6 +133,208 @@ const UnstableChartBackground: React.FC = () => {
   );
 };
 
+// --- DRAWING TOOL COMPONENTS ---
+const COLORS = [
+  '#000000', // Black
+  '#FF0000', // Red
+  '#00FF00', // Green
+  '#0000FF', // Blue
+  '#F08080', // Piggy Pink
+  '#FFD700', // Gold
+  '#FFFFFF', // Eraser
+];
+
+const DrawingTool: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [color, setColor] = useState('#000000');
+  const [lineWidth, setLineWidth] = useState(5);
+
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    setIsDrawing(true);
+    const { offsetX, offsetY } = getCoordinates(e, canvas);
+    ctx.beginPath();
+    ctx.moveTo(offsetX, offsetY);
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = color;
+  };
+
+  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isDrawing) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const { offsetX, offsetY } = getCoordinates(e, canvas);
+    ctx.lineTo(offsetX, offsetY);
+    ctx.stroke();
+  };
+
+  const stopDrawing = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    ctx.closePath();
+    setIsDrawing(false);
+  };
+
+  const getCoordinates = (e: React.MouseEvent | React.TouchEvent, canvas: HTMLCanvasElement) => {
+    let clientX, clientY;
+    if ('touches' in e) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = (e as React.MouseEvent).clientX;
+      clientY = (e as React.MouseEvent).clientY;
+    }
+    const rect = canvas.getBoundingClientRect();
+    return {
+      offsetX: clientX - rect.left,
+      offsetY: clientY - rect.top
+    };
+  };
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+  };
+
+  const downloadCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const link = document.createElement('a');
+    link.download = 'my-usdut-masterpiece.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  };
+
+  // Initialize white background
+  useEffect(() => {
+    clearCanvas();
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center gap-4 w-full">
+      <div className="border-4 border-black bg-white shadow-[8px_8px_0_rgba(0,0,0,0.2)]">
+        <canvas
+          ref={canvasRef}
+          width={window.innerWidth < 600 ? 300 : 600}
+          height={400}
+          className="cursor-crosshair touch-none"
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseLeave={stopDrawing}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
+        />
+      </div>
+      
+      <div className="flex flex-wrap justify-center gap-4 bg-white p-4 hand-drawn-border rotate-1">
+        {/* Colors */}
+        <div className="flex gap-2 items-center">
+          {COLORS.map((c) => (
+            <button
+              key={c}
+              onClick={() => setColor(c)}
+              className={`w-8 h-8 rounded-full border-2 border-black transition-transform hover:scale-110 ${color === c ? 'ring-2 ring-offset-2 ring-black' : ''}`}
+              style={{ backgroundColor: c }}
+              aria-label={`Select color ${c}`}
+            />
+          ))}
+        </div>
+
+        <div className="w-px h-8 bg-black/20 mx-2"></div>
+
+        {/* Brush Size */}
+        <div className="flex gap-2 items-center">
+          <button onClick={() => setLineWidth(5)} className={`p-1 ${lineWidth === 5 ? 'bg-gray-200' : ''} rounded`}>
+            <div className="w-2 h-2 bg-black rounded-full"></div>
+          </button>
+          <button onClick={() => setLineWidth(10)} className={`p-1 ${lineWidth === 10 ? 'bg-gray-200' : ''} rounded`}>
+            <div className="w-4 h-4 bg-black rounded-full"></div>
+          </button>
+          <button onClick={() => setLineWidth(20)} className={`p-1 ${lineWidth === 20 ? 'bg-gray-200' : ''} rounded`}>
+            <div className="w-6 h-6 bg-black rounded-full"></div>
+          </button>
+        </div>
+
+        <div className="w-px h-8 bg-black/20 mx-2"></div>
+
+        {/* Actions */}
+        <div className="flex gap-2">
+          <button onClick={clearCanvas} className="p-2 hover:bg-red-100 rounded text-red-600 transition-colors" title="Clear Canvas">
+            <TrashIcon />
+          </button>
+          <button onClick={downloadCanvas} className="p-2 hover:bg-green-100 rounded text-green-600 transition-colors" title="Download">
+            <DownloadIcon />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+const MEME_IMAGES = [
+  "https://pbs.twimg.com/media/Gzj0U6SWQAE7axL?format=jpg&name=large",
+  "https://pbs.twimg.com/media/GzmfUhMWkAAVSTu?format=jpg&name=large",
+  "https://pbs.twimg.com/media/GziAQzIWsAAR4sG?format=jpg&name=large",
+  "https://pbs.twimg.com/media/Gzq4TkMXYAAjNG7?format=jpg&name=medium",
+  "https://pbs.twimg.com/media/Gzoq0B0XMAAHp8p?format=jpg&name=large",
+  "https://pbs.twimg.com/media/GzrZeO1X0AAGOL6?format=jpg&name=large",
+  "https://pbs.twimg.com/media/GzsbWcEWYAAh36x?format=jpg&name=large",
+  "https://pbs.twimg.com/media/GzvivFiXgAAnxzT?format=jpg&name=large",
+  "https://pbs.twimg.com/media/GzwPrPcWIAARVfN?format=jpg&name=large",
+  "https://pbs.twimg.com/media/GzxkBBzXQAEwSfl?format=jpg&name=medium"
+];
+
+const MemeMarquee: React.FC = () => {
+  return (
+    <div className="overflow-hidden bg-[#222] py-6 border-y-4 border-black rotate-1 z-30 relative my-12 shadow-[0_0_20px_rgba(0,0,0,0.3)]">
+      <div className="flex w-max animate-scroll hover:pause">
+        {/* Render images multiple times for seamless looping */}
+        {[...MEME_IMAGES, ...MEME_IMAGES, ...MEME_IMAGES].map((src, i) => (
+          <div key={i} className="mx-4 transform hover:scale-105 transition-transform duration-300">
+             <img 
+               src={src} 
+               alt={`Meme ${i}`} 
+               className="h-64 w-auto rounded-xl border-4 border-white shadow-[4px_4px_0_#000] object-cover bg-white" 
+             />
+          </div>
+        ))}
+      </div>
+      <style>{`
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-33.33%); }
+        }
+        .animate-scroll {
+          animation: scroll 40s linear infinite;
+        }
+        .hover\\:pause:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const CA = "3vz82EWYv8xnc7Cm7qSgERcpMeqw92PcX8PBz88npump";
   const TICKER = "$USDUT";
@@ -151,9 +367,9 @@ const App: React.FC = () => {
           {/* Quick Links */}
           <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-lg font-bold font-hand">
             <a href="#manifesto" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">MANIFESTO</a>
-            <a href="#stats" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">STATS</a>
+            <a href="#draw" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">DRAW</a>
+            <a href="#howto" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">HOW TO BUY</a>
             <a href="#chart" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">CHART</a>
-            <a href="#buy" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">BUY</a>
           </div>
 
           <div className="flex gap-4 items-center">
@@ -185,7 +401,7 @@ const App: React.FC = () => {
           </h1>
           
           <p className="text-2xl md:text-3xl text-white mb-8 font-bold tracking-widest bg-black inline-block px-4 py-1 transform rotate-1 border-2 border-white">
-            1 USDUT = 1 USDUT (MAYBE)
+            1 USDUT = 1 USDT
           </p>
           
           <div className="bg-white p-4 border-4 border-black mb-8 w-full max-w-2xl transform -rotate-1 shadow-[8px_8px_0_rgba(0,0,0,0.2)]">
@@ -212,35 +428,30 @@ const App: React.FC = () => {
         </div>
       </header>
 
+      {/* Floating Meme Marquee */}
+      <MemeMarquee />
+
       {/* Handwritten Story Section */}
       <section id="manifesto" className="py-20 px-4 relative z-20">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <PaperCard rotate="rotate-1" className="bg-[#fffbeb]">
-            <h2 className="text-4xl md:text-5xl mb-6 text-center transform -rotate-2 underline decoration-wavy decoration-teal-500">
-              The Manifesto
-            </h2>
-            
-            <div className="flex justify-center mb-8">
-              <img 
-                src="https://pbs.twimg.com/media/GzoYVH9WwAASDbt?format=jpg&name=large" 
-                alt="Unstable Tether Meme" 
-                className="w-full max-w-lg rounded-lg border-4 border-black transform rotate-1 shadow-[6px_6px_0_rgba(0,0,0,0.2)] hover:scale-105 transition-transform duration-300"
-              />
-            </div>
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              {/* Image (Left) */}
+              <div className="w-full md:w-1/2">
+                <img 
+                  src="https://pbs.twimg.com/media/GzoYVH9WwAASDbt?format=jpg&name=large" 
+                  alt="Unstable Tether Meme" 
+                  className="w-full rounded-lg border-4 border-black transform -rotate-1 shadow-[6px_6px_0_rgba(0,0,0,0.2)] hover:scale-105 transition-transform duration-300"
+                />
+              </div>
 
-            <div className="text-2xl md:text-3xl space-y-6 leading-relaxed font-hand">
-              <p>
-                Hi. We are <span className="font-bold text-teal-600">Unstable Tether</span>.
-              </p>
-              <p>
-                Unlike other stablecoins that promise you $1.00 and give you anxiety, we promise you nothing and give you vibes.
-              </p>
-              <p>
-                We are fully audited by "Trust Me Bro LLC". Our reserves are backed by hopes, dreams, and a half-eaten sandwich I found earlier.
-              </p>
-              <p className="text-center font-bold text-4xl mt-8 transform rotate-1">
-                STAY UNSTABLE.
-              </p>
+              {/* Text (Right) */}
+              <div className="w-full md:w-1/2 font-hand text-xl md:text-2xl space-y-4">
+                <p>Hi. We are <span className="font-bold text-teal-600">Unstable Tether</span>.</p>
+                <p>Unlike other stablecoins that promise you $1.00 and give you anxiety, we promise you nothing and give you vibes.</p>
+                <p>We are fully audited by "Trust Me Bro LLC". Our reserves are backed by hopes, dreams, and a half-eaten sandwich I found earlier.</p>
+                <p className="font-bold text-3xl mt-4 transform rotate-1">STAY UNSTABLE.</p>
+              </div>
             </div>
           </PaperCard>
         </div>
@@ -266,6 +477,56 @@ const App: React.FC = () => {
               <div className="text-5xl mb-2">📉</div>
               <h3 className="text-2xl font-bold">Peg Status</h3>
               <p className="text-4xl font-black mt-2">Unstable</p>
+            </PaperCard>
+          </div>
+        </div>
+      </section>
+
+      {/* Drawing Section */}
+      <section id="draw" className="py-20 px-4 relative z-20">
+        <div className="max-w-4xl mx-auto flex flex-col items-center">
+          <h2 className="text-5xl md:text-6xl text-center mb-10 text-white font-bold drop-shadow-[4px_4px_0_#000] transform rotate-1">
+            DRAW YOUR USDUT
+          </h2>
+          <DrawingTool />
+        </div>
+      </section>
+
+      {/* How To Buy Section */}
+      <section id="howto" className="py-20 px-4 relative z-20">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-5xl md:text-7xl text-center mb-12 text-white font-bold drop-shadow-[4px_4px_0_#000] transform -rotate-2">
+            HOW TO BUY
+          </h2>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Step 1 */}
+            <PaperCard rotate="-rotate-2" className="bg-[#e0f2f1] hover:scale-105 transition-transform duration-300">
+              <div className="text-4xl font-bold mb-4 bg-black text-white w-12 h-12 flex items-center justify-center rounded-full border-2 border-white">1</div>
+              <h3 className="text-2xl font-bold mb-2">Create Wallet</h3>
+              <p className="text-lg">Download Phantom or any Solana wallet. It's like a pocket, but digital and safer (usually).</p>
+            </PaperCard>
+
+            {/* Step 2 */}
+            <PaperCard rotate="rotate-1" className="bg-[#fff9c4] hover:scale-105 transition-transform duration-300">
+              <div className="text-4xl font-bold mb-4 bg-black text-white w-12 h-12 flex items-center justify-center rounded-full border-2 border-white">2</div>
+              <h3 className="text-2xl font-bold mb-2">Get SOL</h3>
+              <p className="text-lg">Buy Solana from an exchange and send it to your wallet. Fuel for the rocket.</p>
+            </PaperCard>
+
+            {/* Step 3 */}
+            <PaperCard rotate="-rotate-1" className="bg-[#ffebee] hover:scale-105 transition-transform duration-300">
+              <div className="text-4xl font-bold mb-4 bg-black text-white w-12 h-12 flex items-center justify-center rounded-full border-2 border-white">3</div>
+              <h3 className="text-2xl font-bold mb-2">Go to Pump.fun</h3>
+              <p className="text-lg">Connect your wallet. Don't worry, we won't tell your mom what you're doing.</p>
+              <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer" className="block mt-4 text-center bg-black text-white py-2 rounded font-bold hover:bg-gray-800">GO TO LINK</a>
+            </PaperCard>
+
+            {/* Step 4 */}
+            <PaperCard rotate="rotate-2" className="bg-[#e3f2fd] hover:scale-105 transition-transform duration-300">
+              <div className="text-4xl font-bold mb-4 bg-black text-white w-12 h-12 flex items-center justify-center rounded-full border-2 border-white">4</div>
+              <h3 className="text-2xl font-bold mb-2">Buy $USDUT</h3>
+              <p className="text-lg">Swap SOL for USDUT. Welcome to the unstable family. Hold tight.</p>
             </PaperCard>
           </div>
         </div>
