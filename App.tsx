@@ -140,6 +140,7 @@ const COLORS = [
   '#00FF00', // Green
   '#0000FF', // Blue
   '#F08080', // Piggy Pink
+  '#50bda3', // Background Green
   '#FFD700', // Gold
   '#FFFFFF', // Eraser
 ];
@@ -366,7 +367,7 @@ const App: React.FC = () => {
           
           {/* Quick Links */}
           <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-lg font-bold font-hand">
-            <a href="#manifesto" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">MANIFESTO</a>
+            <a href="#about" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">ABOUT</a>
             <a href="#draw" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">DRAW</a>
             <a href="#howto" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">HOW TO BUY</a>
             <a href="#chart" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">CHART</a>
@@ -432,7 +433,7 @@ const App: React.FC = () => {
       <MemeMarquee />
 
       {/* Handwritten Story Section */}
-      <section id="manifesto" className="py-20 px-4 relative z-20">
+      <section id="about" className="py-20 px-4 relative z-20">
         <div className="max-w-5xl mx-auto">
           <PaperCard rotate="rotate-1" className="bg-[#fffbeb]">
             <div className="flex flex-col md:flex-row items-center gap-8">
