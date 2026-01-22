@@ -136,7 +136,7 @@ const App: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#1a1c22] text-white selection:bg-white selection:text-black">
+    <div className="min-h-screen text-white selection:bg-white selection:text-black bg-[#0a0b0e]">
       
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 p-8 flex justify-between items-center bg-gradient-to-b from-black/40 to-transparent">
@@ -165,9 +165,9 @@ const App: React.FC = () => {
       {/* Main Sections */}
       <main className="relative">
         
-        {/* Hero Section */}
+        {/* Hero Section (Remains unchanged with its own space bg) */}
         <section 
-          className="relative min-h-screen flex flex-col items-center justify-center px-6 text-center"
+          className="relative min-h-screen flex flex-col items-center justify-center px-6 text-center z-10"
           style={{ 
             backgroundImage: `linear-gradient(to bottom, rgba(26, 28, 34, 0.7), rgba(26, 28, 34, 0.8)), url("${HERO_BG_URL}")`,
             backgroundSize: 'cover',
@@ -219,169 +219,164 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* Manifesto Section */}
-        <section id="manifesto" className="py-40 px-6 bg-[#1a1c22]">
-          <div className="max-w-2xl mx-auto space-y-16">
-            <div className="space-y-12">
-              <div className="space-y-4 text-center md:text-left">
-                <span className="text-[10px] tracking-[0.4em] uppercase text-white/30">Manifesto</span>
-                <h2 className="text-4xl font-light italic leading-relaxed">"The market is a chaotic arena of noise and hesitation. In this landscape, the BlackBull does not browse; it conquers."</h2>
-              </div>
-              
-              {/* Requested Image in About Section */}
-              <div className="w-full grayscale border border-white/5 p-1 bg-white/[0.02]">
-                <img src={MANIFESTO_BANNER} alt="BlackBull Banner" className="w-full block" />
-              </div>
-            </div>
-            
-            <div className="font-light text-white/40 leading-relaxed text-lg space-y-8 text-justify">
-              <p>
-                We are the antithesis of the stable, the predictable, and the weak. Our power is not derived from logic, but from the raw, high-voltage energy of the collective herd. 
-              </p>
-              <p>
-                To live is to charge. To stall is to vanish. We are building a community that strikes like lightning. When others retreat, we accelerate. Our ticker is a declaration of war against the red candles of mediocrity.
-              </p>
-            </div>
-          </div>
-        </section>
+        {/* Universe Section Start (Everything below the Hero) */}
+        <div className="universe-container relative">
+          {/* Background Starfield Layers */}
+          <div className="stars-sm"></div>
+          <div className="stars-md"></div>
+          <div className="stars-lg"></div>
 
-        {/* Roadmap Section */}
-        <section id="roadmap" className="py-40 px-6 bg-[#1a1c22] relative overflow-hidden">
-           <div className="max-w-5xl mx-auto flex flex-col items-center">
-              <h2 className="text-[12px] tracking-[0.5em] font-light uppercase text-white/40 mb-24">Roadmap Strategy</h2>
-              
-              <div className="relative w-full">
-                {/* Vertical Center Line */}
-                <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[1px] bg-white/10 hidden md:block"></div>
+          {/* Manifesto Section */}
+          <section id="manifesto" className="relative py-40 px-6 bg-transparent z-10">
+            <div className="max-w-2xl mx-auto space-y-16">
+              <div className="space-y-12">
+                <div className="space-y-4 text-center md:text-left">
+                  <span className="text-[10px] tracking-[0.4em] uppercase text-white/30">Manifesto</span>
+                  <h2 className="text-4xl font-light italic leading-relaxed">"The market is a chaotic arena of noise and hesitation. In this landscape, the BlackBull does not browse; it conquers."</h2>
+                </div>
                 
-                <div className="space-y-24 md:space-y-12">
-                  {roadmapItems.map((item, idx) => (
-                    <div key={idx} className={`relative flex flex-col md:flex-row items-center w-full ${item.side === 'left' ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
-                      
-                      {/* Side Content */}
-                      <div className="md:w-1/2 flex justify-center">
-                         <div className={`w-full max-w-[340px] bg-black/40 border border-white/5 p-8 relative transition-all hover:bg-white/[0.02] ${item.side === 'left' ? 'md:mr-16' : 'md:ml-16'}`}>
-                            <div className="flex items-center justify-between mb-4">
-                               <span className="text-[10px] tracking-widest text-white/40 uppercase">{item.phase}</span>
-                               <span className="opacity-40">{item.icon}</span>
-                            </div>
-                            <h3 className="text-xl font-light tracking-wide mb-3">{item.title}</h3>
-                            <p className="text-xs font-light leading-relaxed text-white/30 uppercase tracking-widest">{item.desc}</p>
-                         </div>
-                      </div>
-
-                      {/* Center Dot */}
-                      <div className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#1a1c22] border border-white/40 rounded-full hidden md:flex items-center justify-center z-10">
-                        <div className="w-1 h-1 bg-white rounded-full"></div>
-                      </div>
-                      
-                    </div>
-                  ))}
+                <div className="w-full grayscale border border-white/5 p-1 bg-white/[0.02] backdrop-blur-sm">
+                  <img src={MANIFESTO_BANNER} alt="BlackBull Banner" className="w-full block" />
                 </div>
               </div>
-           </div>
-        </section>
-
-        {/* Token Specifications Section */}
-        <section id="token" className="py-32 px-6 bg-gradient-to-b from-[#1a1c22] to-[#14161a]">
-          <div className="max-w-5xl mx-auto flex flex-col items-center text-center">
-            
-            <h2 className="text-[12px] tracking-[0.5em] font-light uppercase text-white/40 mb-16">
-              Token Specifications
-            </h2>
-
-            {/* Contract Address Box */}
-            <div className="w-full max-w-4xl bg-black/40 border border-white/5 p-12 mb-1">
-              <div className="text-[10px] tracking-[0.4em] uppercase text-white/30 mb-4">Contract Address</div>
-              <code className="text-sm md:text-xl font-light tracking-[0.1em] text-white/90 break-all cursor-pointer hover:text-white transition-colors" onClick={copyCA}>
-                {CA}
-              </code>
-              {copied && <div className="text-[9px] mt-2 tracking-widest text-white/40 uppercase">Synced to Clipboard</div>}
-            </div>
-
-            {/* Stats Grid */}
-            <div className="w-full max-w-4xl grid grid-cols-2 lg:grid-cols-4 bg-black/40 border border-white/5 overflow-hidden">
-              <div className="flex flex-col items-center justify-center p-12 border-b lg:border-b-0 lg:border-r border-white/5 transition-colors hover:bg-white/[0.02]">
-                <SupplyIcon />
-                <span className="text-3xl font-light tracking-widest mt-6">1B</span>
-                <span className="text-[9px] tracking-[0.2em] uppercase text-white/30 mt-2">Total Supply</span>
-              </div>
-              <div className="flex flex-col items-center justify-center p-12 border-b lg:border-b-0 lg:border-r border-white/5 transition-colors hover:bg-white/[0.02]">
-                <TaxIcon />
-                <span className="text-3xl font-light tracking-widest mt-6">0/0</span>
-                <span className="text-[9px] tracking-[0.2em] uppercase text-white/30 mt-2">Tax</span>
-              </div>
-              <div className="flex flex-col items-center justify-center p-12 border-b md:border-b-0 lg:border-r border-white/5 transition-colors hover:bg-white/[0.02]">
-                <BurntIcon />
-                <span className="text-3xl font-light tracking-widest mt-6">100%</span>
-                <span className="text-[9px] tracking-[0.2em] uppercase text-white/30 mt-2">Burnt</span>
-              </div>
-              <div className="flex flex-col items-center justify-center p-12 transition-colors hover:bg-white/[0.02]">
-                <NetworkIcon />
-                <span className="text-3xl font-light tracking-widest mt-6">SOL</span>
-                <span className="text-[9px] tracking-[0.2em] uppercase text-white/30 mt-2">Network</span>
+              
+              <div className="font-light text-white/40 leading-relaxed text-lg space-y-8 text-justify">
+                <p>
+                  We are the antithesis of the stable, the predictable, and the weak. Our power is not derived from logic, but from the raw, high-voltage energy of the collective herd. 
+                </p>
+                <p>
+                  To live is to charge. To stall is to vanish. We are building a community that strikes like lightning. When others retreat, we accelerate. Our ticker is a declaration of war against the red candles of mediocrity.
+                </p>
               </div>
             </div>
+          </section>
 
-            {/* Quote Bottom */}
-            <p className="mt-20 font-serif italic text-white/40 text-sm tracking-wide">
-              "True to the Nietzschean spirit of freedom—no tax, no restrictions, no turning back."
-            </p>
+          {/* Roadmap Section */}
+          <section id="roadmap" className="relative py-40 px-6 bg-transparent overflow-hidden z-10">
+            <div className="max-w-5xl mx-auto flex flex-col items-center">
+                <h2 className="text-[12px] tracking-[0.5em] font-light uppercase text-white/40 mb-24">Roadmap Strategy</h2>
+                
+                <div className="relative w-full">
+                  <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[1px] bg-white/10 hidden md:block"></div>
+                  
+                  <div className="space-y-24 md:space-y-12">
+                    {roadmapItems.map((item, idx) => (
+                      <div key={idx} className={`relative flex flex-col md:flex-row items-center w-full ${item.side === 'left' ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+                        <div className="md:w-1/2 flex justify-center">
+                          <div className={`w-full max-w-[340px] bg-black/40 border border-white/5 p-8 relative transition-all hover:bg-white/[0.05] backdrop-blur-md ${item.side === 'left' ? 'md:mr-16' : 'md:ml-16'}`}>
+                              <div className="flex items-center justify-between mb-4">
+                                <span className="text-[10px] tracking-widest text-white/40 uppercase">{item.phase}</span>
+                                <span className="opacity-40">{item.icon}</span>
+                              </div>
+                              <h3 className="text-xl font-light tracking-wide mb-3">{item.title}</h3>
+                              <p className="text-xs font-light leading-relaxed text-white/30 uppercase tracking-widest">{item.desc}</p>
+                          </div>
+                        </div>
+                        <div className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#1a1c22] border border-white/40 rounded-full hidden md:flex items-center justify-center z-10">
+                          <div className="w-1 h-1 bg-white rounded-full"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+            </div>
+          </section>
 
-          </div>
-        </section>
+          {/* Token Specifications Section */}
+          <section id="token" className="relative py-32 px-6 bg-transparent z-10">
+            <div className="max-w-5xl mx-auto flex flex-col items-center text-center">
+              
+              <h2 className="text-[12px] tracking-[0.5em] font-light uppercase text-white/40 mb-16">
+                Token Specifications
+              </h2>
 
-        {/* Radar Section */}
-        <section id="chart" className="py-24 px-6 bg-[#14161a] border-t border-white/5">
-          <div className="max-w-6xl mx-auto">
-            <div className="bg-white/[0.02] border border-white/5 p-1">
-              <div className="relative w-full pb-[110%] md:pb-[60%] lg:pb-[45%] grayscale hover:grayscale-0 transition-all duration-1000">
-                <iframe 
-                  src={`https://dexscreener.com/solana/${CA}?embed=1&loadChartSettings=0&chartLeftToolbar=0&chartTheme=dark&theme=dark&chartStyle=1&chartType=usd&interval=15`}
-                  title="BlackBull Chart"
-                  className="absolute inset-0 w-full h-full border-0"
-                />
+              <div className="w-full max-w-4xl bg-black/60 border border-white/5 p-12 mb-1 backdrop-blur-lg transition-colors hover:bg-black/70">
+                <div className="text-[10px] tracking-[0.4em] uppercase text-white/30 mb-4">Contract Address</div>
+                <code className="text-sm md:text-xl font-light tracking-[0.1em] text-white/90 break-all cursor-pointer hover:text-white transition-colors" onClick={copyCA}>
+                  {CA}
+                </code>
+                {copied && <div className="text-[9px] mt-2 tracking-widest text-white/40 uppercase">Synced to Clipboard</div>}
+              </div>
+
+              <div className="w-full max-w-4xl grid grid-cols-2 lg:grid-cols-4 bg-black/60 border border-white/5 overflow-hidden backdrop-blur-lg">
+                <div className="flex flex-col items-center justify-center p-12 border-b lg:border-b-0 lg:border-r border-white/5 transition-colors hover:bg-white/[0.02]">
+                  <SupplyIcon />
+                  <span className="text-3xl font-light tracking-widest mt-6">1B</span>
+                  <span className="text-[9px] tracking-[0.2em] uppercase text-white/30 mt-2">Total Supply</span>
+                </div>
+                <div className="flex flex-col items-center justify-center p-12 border-b lg:border-b-0 lg:border-r border-white/5 transition-colors hover:bg-white/[0.02]">
+                  <TaxIcon />
+                  <span className="text-3xl font-light tracking-widest mt-6">0/0</span>
+                  <span className="text-[9px] tracking-[0.2em] uppercase text-white/30 mt-2">Tax</span>
+                </div>
+                <div className="flex flex-col items-center justify-center p-12 border-b md:border-b-0 lg:border-r border-white/5 transition-colors hover:bg-white/[0.02]">
+                  <BurntIcon />
+                  <span className="text-3xl font-light tracking-widest mt-6">100%</span>
+                  <span className="text-[9px] tracking-[0.2em] uppercase text-white/30 mt-2">Burnt</span>
+                </div>
+                <div className="flex flex-col items-center justify-center p-12 transition-colors hover:bg-white/[0.02]">
+                  <NetworkIcon />
+                  <span className="text-3xl font-light tracking-widest mt-6">SOL</span>
+                  <span className="text-[9px] tracking-[0.2em] uppercase text-white/30 mt-2">Network</span>
+                </div>
+              </div>
+
+              <p className="mt-20 font-serif italic text-white/40 text-sm tracking-wide">
+                "True to the Nietzschean spirit of freedom—no tax, no restrictions, no turning back."
+              </p>
+            </div>
+          </section>
+
+          {/* Radar Section */}
+          <section id="chart" className="relative py-24 px-6 bg-transparent border-t border-white/5 z-10">
+            <div className="max-w-6xl mx-auto">
+              <div className="bg-black/50 border border-white/5 p-1 backdrop-blur-md">
+                <div className="relative w-full pb-[110%] md:pb-[60%] lg:pb-[45%] grayscale hover:grayscale-0 transition-all duration-1000">
+                  <iframe 
+                    src={`https://dexscreener.com/solana/${CA}?embed=1&loadChartSettings=0&chartLeftToolbar=0&chartTheme=dark&theme=dark&chartStyle=1&chartType=usd&interval=15`}
+                    title="BlackBull Chart"
+                    className="absolute inset-0 w-full h-full border-0"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-      </main>
+          {/* Footer (Inside universe container) */}
+          <footer className="relative py-24 px-8 border-t border-white/5 bg-black/40 backdrop-blur-xl flex flex-col items-center text-center z-10">
+            <div className="max-w-md mx-auto space-y-12">
+              <div className="space-y-4">
+                <img src={LOGO_URL} alt="Footer Logo" className="w-12 h-12 rounded-full mx-auto grayscale border border-white/10 p-0.5" />
+                <div className="flex flex-col">
+                    <span className="text-[12px] font-medium tracking-[0.4em] uppercase">{PROJECT_NAME}</span>
+                    <span className="text-[10px] tracking-[0.2em] opacity-40 uppercase">Solana Ecosystem</span>
+                </div>
+              </div>
 
-      {/* Footer */}
-      <footer className="py-24 px-8 border-t border-white/5 bg-[#14161a] flex flex-col items-center text-center">
-        <div className="max-w-md mx-auto space-y-12">
-          
-          <div className="space-y-4">
-             <img src={LOGO_URL} alt="Footer Logo" className="w-12 h-12 rounded-full mx-auto grayscale border border-white/10 p-0.5" />
-             <div className="flex flex-col">
-                <span className="text-[12px] font-medium tracking-[0.4em] uppercase">{PROJECT_NAME}</span>
-                <span className="text-[10px] tracking-[0.2em] opacity-40 uppercase">Solana Ecosystem</span>
-             </div>
-          </div>
+              <p className="font-serif italic text-white/40 text-sm italic">"Towards the charge."</p>
 
-          <p className="font-serif italic text-white/40 text-sm italic">"Towards the charge."</p>
+              <div className="flex gap-4 justify-center">
+                <a href={X_LINK} target="_blank" rel="noopener noreferrer" className="p-4 border border-white/5 hover:border-white/20 transition-all opacity-40 hover:opacity-100 bg-black/20">
+                  <XIcon />
+                </a>
+                <a href={DEX_LINK} target="_blank" rel="noopener noreferrer" className="p-4 border border-white/5 hover:border-white/20 transition-all opacity-40 hover:opacity-100 bg-black/20">
+                  <ChartIcon />
+                </a>
+                <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer" className="p-4 border border-white/5 hover:border-white/20 transition-all opacity-40 hover:opacity-100 bg-black/20">
+                  <HeartIcon />
+                </a>
+              </div>
 
-          <div className="flex gap-4 justify-center">
-            <a href={X_LINK} target="_blank" rel="noopener noreferrer" className="p-4 border border-white/5 hover:border-white/20 transition-all opacity-40 hover:opacity-100">
-               <XIcon />
-            </a>
-            <a href={DEX_LINK} target="_blank" rel="noopener noreferrer" className="p-4 border border-white/5 hover:border-white/20 transition-all opacity-40 hover:opacity-100">
-               <ChartIcon />
-            </a>
-            <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer" className="p-4 border border-white/5 hover:border-white/20 transition-all opacity-40 hover:opacity-100">
-               <HeartIcon />
-            </a>
-          </div>
-
-          <div className="pt-8 border-t border-white/5 space-y-4">
-             <p className="text-[9px] leading-relaxed opacity-20 uppercase tracking-[0.2em] max-w-xs mx-auto">
-               $BLACKBULL IS A TOKEN FOR THOSE WHO SEEK THE INTERIOR. NO INTRINSIC VALUE. NO PROMISES. ONLY THE CHARGE.
-             </p>
-             <p className="text-[10px] tracking-[0.3em] uppercase opacity-40">BlackBull Collective © 2026</p>
-          </div>
+              <div className="pt-8 border-t border-white/5 space-y-4">
+                <p className="text-[9px] leading-relaxed opacity-20 uppercase tracking-[0.2em] max-w-xs mx-auto">
+                  $BLACKBULL IS A TOKEN FOR THOSE WHO SEEK THE INTERIOR. NO INTRINSIC VALUE. NO PROMISES. ONLY THE CHARGE.
+                </p>
+                <p className="text-[10px] tracking-[0.3em] uppercase opacity-40">BlackBull Collective © 2026</p>
+              </div>
+            </div>
+          </footer>
         </div>
-      </footer>
+      </main>
     </div>
   );
 };

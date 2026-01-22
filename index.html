@@ -61,8 +61,55 @@
         color: #ffffff;
       }
 
-      .content-fade {
-        mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+      /* Universe Starfield Effect */
+      .universe-container {
+        position: relative;
+        background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+        overflow: hidden;
+      }
+
+      .stars-sm, .stars-md, .stars-lg {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* Twinkling Animation */
+      @keyframes twinkle {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+      }
+
+      .stars-sm {
+        background-image: 
+          radial-gradient(1px 1px at 20px 30px, #eee, rgba(0,0,0,0)),
+          radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+          radial-gradient(1px 1px at 50px 160px, #ddd, rgba(0,0,0,0)),
+          radial-gradient(1px 1px at 80px 120px, #fff, rgba(0,0,0,0)),
+          radial-gradient(1px 1px at 110px 10px, #eee, rgba(0,0,0,0)),
+          radial-gradient(1px 1px at 150px 150px, #fff, rgba(0,0,0,0));
+        background-size: 200px 200px;
+        animation: twinkle 4s ease-in-out infinite;
+      }
+
+      .stars-md {
+        background-image: 
+          radial-gradient(2px 2px at 100px 100px, #fff, rgba(0,0,0,0)),
+          radial-gradient(2px 2px at 200px 250px, #eee, rgba(0,0,0,0)),
+          radial-gradient(2px 2px at 300px 50px, #fff, rgba(0,0,0,0)),
+          radial-gradient(2px 2px at 400px 350px, #ddd, rgba(0,0,0,0));
+        background-size: 500px 500px;
+        animation: twinkle 6s ease-in-out infinite;
+      }
+
+      .stars-lg {
+        background-image: 
+          radial-gradient(2px 2px at 50px 50px, #fff, rgba(0,0,0,0)),
+          radial-gradient(3px 3px at 250px 450px, #eee, rgba(0,0,0,0)),
+          radial-gradient(2px 2px at 450px 150px, #fff, rgba(0,0,0,0));
+        background-size: 800px 800px;
+        animation: twinkle 10s ease-in-out infinite;
       }
 
       ::-webkit-scrollbar { width: 6px; }
