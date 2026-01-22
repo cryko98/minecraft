@@ -25,6 +25,13 @@ const ChartIcon = () => (
   </svg>
 );
 
+const EmailIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="20" height="16" x="2" y="4" rx="2" />
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+  </svg>
+);
+
 // Token Specs Icons
 const SupplyIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-40">
@@ -95,6 +102,7 @@ const App: React.FC = () => {
   const X_LINK = "https://x.com/blackbullonsol?s=21";
   const PUMP_LINK = `https://pump.fun/coin/${CA}`;
   const DEX_LINK = `https://dexscreener.com/solana/${CA}`;
+  const CONTACT_EMAIL = "blackbullonsol@gmail.com";
 
   const [copied, setCopied] = useState(false);
 
@@ -165,7 +173,7 @@ const App: React.FC = () => {
       {/* Main Sections */}
       <main className="relative">
         
-        {/* Hero Section (Remains unchanged with its own space bg) */}
+        {/* Hero Section */}
         <section 
           className="relative min-h-screen flex flex-col items-center justify-center px-6 text-center z-10"
           style={{ 
@@ -219,9 +227,8 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* Universe Section Start (Everything below the Hero) */}
+        {/* Universe Section Start */}
         <div className="universe-container relative">
-          {/* Background Starfield Layers */}
           <div className="stars-sm"></div>
           <div className="stars-md"></div>
           <div className="stars-lg"></div>
@@ -342,7 +349,7 @@ const App: React.FC = () => {
             </div>
           </section>
 
-          {/* Footer (Inside universe container) */}
+          {/* Footer (Lábléc) */}
           <footer className="relative py-24 px-8 border-t border-white/5 bg-black/40 backdrop-blur-xl flex flex-col items-center text-center z-10">
             <div className="max-w-md mx-auto space-y-12">
               <div className="space-y-4">
@@ -364,6 +371,15 @@ const App: React.FC = () => {
                 </a>
                 <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer" className="p-4 border border-white/5 hover:border-white/20 transition-all opacity-40 hover:opacity-100 bg-black/20">
                   <HeartIcon />
+                </a>
+                <a href={`mailto:${CONTACT_EMAIL}`} className="p-4 border border-white/5 hover:border-white/20 transition-all opacity-40 hover:opacity-100 bg-black/20">
+                  <EmailIcon />
+                </a>
+              </div>
+
+              <div className="space-y-2">
+                <a href={`mailto:${CONTACT_EMAIL}`} className="text-[11px] tracking-[0.2em] text-white/30 hover:text-white/60 transition-colors uppercase">
+                  {CONTACT_EMAIL}
                 </a>
               </div>
 
