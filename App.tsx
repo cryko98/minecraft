@@ -308,7 +308,7 @@ const App: React.FC = () => {
               <div className="w-full max-w-4xl grid grid-cols-2 lg:grid-cols-4 bg-black/60 border border-white/5 overflow-hidden backdrop-blur-lg">
                 <div className="flex flex-col items-center justify-center p-12 border-b lg:border-b-0 lg:border-r border-white/5 transition-colors hover:bg-white/[0.02]">
                   <SupplyIcon />
-                  <span className="text-3xl font-light tracking-widest mt-6">1B</span>
+                  <span className="text-3xl font-light tracking-widest mt-6">994.8M</span>
                   <span className="text-[9px] tracking-[0.2em] uppercase text-white/30 mt-2">Total Supply</span>
                 </div>
                 <div className="flex flex-col items-center justify-center p-12 border-b lg:border-b-0 lg:border-r border-white/5 transition-colors hover:bg-white/[0.02]">
