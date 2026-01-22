@@ -180,8 +180,8 @@ const App: React.FC = () => {
               {TICKER}
             </div>
 
-            <h1 className="hero-title text-6xl md:text-[100px] leading-tight font-light text-white/95">
-              Towards the <br /> Charge
+            <h1 className="hero-title text-6xl md:text-[100px] leading-tight font-light text-white/95 uppercase">
+              The BlackBull
             </h1>
             
             <p className="max-w-xl mx-auto text-white/40 font-light text-sm md:text-base leading-loose tracking-wide">
@@ -335,7 +335,7 @@ const App: React.FC = () => {
         <section id="chart" className="py-24 px-6 bg-[#14161a] border-t border-white/5">
           <div className="max-w-6xl mx-auto">
             <div className="bg-white/[0.02] border border-white/5 p-1">
-              <div className="relative w-full pb-[60%] lg:pb-[45%] grayscale hover:grayscale-0 transition-all duration-1000">
+              <div className="relative w-full pb-[110%] md:pb-[60%] lg:pb-[45%] grayscale hover:grayscale-0 transition-all duration-1000">
                 <iframe 
                   src={`https://dexscreener.com/solana/${CA}?embed=1&loadChartSettings=0&chartLeftToolbar=0&chartTheme=dark&theme=dark&chartStyle=1&chartType=usd&interval=15`}
                   title="BlackBull Chart"
