@@ -1,42 +1,76 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="https://pbs.twimg.com/profile_images/1960730761067163648/Jo0qh4hm_400x400.jpg" />
+    <link rel="icon" href="https://pbs.twimg.com/profile_images/2014036873820110848/SAIdoDZc_400x400.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Unstable Tether ($USDUT)</title>
+    <title>BlackBull ($blackbull) - Towards the Charge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
+      :root {
+        --bg-color: #1a1c22;
+        --text-color: #ffffff;
+        --accent-color: #00f2ff;
+      }
+      
       body {
-        font-family: 'Patrick Hand', cursive;
-        background-color: #50bda3; /* Estimated green from the logo image */
-        color: #1a1a1a;
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        overflow-x: hidden;
       }
-      h1, h2, h3, h4, h5, h6 {
-        font-family: 'Permanent Marker', cursive;
+
+      .font-serif { font-family: 'Playfair Display', serif; }
+
+      .hero-title {
+        font-weight: 100;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
       }
-      .hand-drawn-border {
-        border: 3px solid #000;
-        border-radius: 2px 255px 3px 25px / 255px 5px 225px 5px;
-        box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
-        transition: all 0.2s ease;
+
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(8px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
-      .hand-drawn-border:hover {
-        transform: scale(1.02) rotate(-1deg);
-        box-shadow: 6px 6px 0 rgba(0,0,0,0.3);
+
+      .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
       }
-      .wobble {
-        animation: wobble 4s ease-in-out infinite;
+
+      .btn-ghost-glow {
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
       }
-      @keyframes wobble {
-        0%, 100% { transform: rotate(0deg); }
-        25% { transform: rotate(-2deg); }
-        75% { transform: rotate(2deg); }
+
+      .nav-link {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: rgba(255, 255, 255, 0.5);
+        transition: color 0.3s ease;
       }
+
+      .nav-link:hover {
+        color: #ffffff;
+      }
+
+      .content-fade {
+        mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+      }
+
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+      html { scroll-behavior: smooth; }
     </style>
   <script type="importmap">
 {

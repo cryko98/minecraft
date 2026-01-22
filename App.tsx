@@ -1,572 +1,386 @@
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 
 // Icons
 const XIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6 fill-current">
+  <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-current">
     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
   </svg>
 );
 
-const CopyIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+const BuyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M7 17l9.2-9.2M17 17V7H7" />
+  </svg>
+);
+
+const HeartIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
   </svg>
 );
 
 const ChartIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-    <line x1="12" y1="20" x2="12" y2="10"></line>
-    <line x1="18" y1="20" x2="18" y2="4"></line>
-    <line x1="6" y1="20" x2="6" y2="16"></line>
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 20v-6M6 20V10M18 20V4M3 20h18" />
   </svg>
 );
 
-const DownloadIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-    <polyline points="7 10 12 15 17 10"></polyline>
-    <line x1="12" y1="15" x2="12" y2="3"></line>
+// Token Specs Icons
+const SupplyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-40">
+    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
   </svg>
 );
 
-const TrashIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-    <polyline points="3 6 5 6 21 6"></polyline>
-    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+const TaxIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-40">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+    <path d="m9 12 2 2 4-4" />
   </svg>
 );
 
-const HandButton: React.FC<{ 
-  onClick?: () => void; 
-  children: React.ReactNode; 
-  className?: string; 
-}> = ({ onClick, children, className = '' }) => {
-  return (
-    <button
-      onClick={onClick}
-      className={`hand-drawn-border bg-white text-black px-6 py-3 text-xl font-bold uppercase cursor-pointer ${className}`}
-    >
-      {children}
-    </button>
-  );
-};
-
-const PaperCard: React.FC<{ children: React.ReactNode; className?: string; rotate?: string }> = ({ children, className = '', rotate = 'rotate-0' }) => (
-  <div className={`bg-[#fdfdfd] text-black p-6 hand-drawn-border ${rotate} ${className}`}>
-    {children}
-  </div>
+const BurntIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-40">
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+  </svg>
 );
 
-// Unstable Chart Background Component
-const UnstableChartBackground: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+const NetworkIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-40">
+    <path d="m16 3 4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16" />
+  </svg>
+);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+// Roadmap Icons
+const RocketIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.71.79-1.35.79-1.35l-4.54-4.54s-.64.08-1.35.79z" />
+    <path d="M15 12V3.5s0-1-1-1-1 1-1 1V12" />
+    <path d="M9 12V6.5s0-1-1-1-1 1-1 1V12" />
+    <path d="M15 12c0 5.5-4.5 10-10 10" />
+    <path d="M9 12c0 5.5 4.5 10 10 10" />
+  </svg>
+);
 
-    let animationFrameId: number;
-    let points: number[] = [];
-    const segmentWidth = 5; // Width between points
+const UsersIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+);
 
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      // Initialize points to fill screen
-      const numPoints = Math.ceil(canvas.width / segmentWidth) + 2;
-      points = new Array(numPoints).fill(canvas.height / 2);
-    };
+const FlagIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+    <line x1="4" y1="22" x2="4" y2="15" />
+  </svg>
+);
 
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    const animate = () => {
-      // Create a jagged, unstable movement for the new point
-      const lastPoint = points[points.length - 1];
-      const volatility = 30; // How much it jumps up/down
-      let nextPoint = lastPoint + (Math.random() - 0.5) * volatility;
-
-      // Keep it somewhat within screen bounds (with padding)
-      if (nextPoint < 50) nextPoint = 50 + Math.random() * 20;
-      if (nextPoint > canvas.height - 50) nextPoint = canvas.height - 50 - Math.random() * 20;
-
-      // Add new point, remove old
-      points.push(nextPoint);
-      points.shift();
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Draw the line
-      ctx.beginPath();
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; // White, semi-transparent
-      ctx.lineWidth = 3;
-      ctx.lineJoin = 'round';
-
-      for (let i = 0; i < points.length; i++) {
-        const x = i * segmentWidth;
-        const y = points[i];
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
-
-  return (
-    <canvas 
-      ref={canvasRef} 
-      className="fixed inset-0 pointer-events-none z-0"
-    />
-  );
-};
-
-// --- DRAWING TOOL COMPONENTS ---
-const COLORS = [
-  '#000000', // Black
-  '#FF0000', // Red
-  '#00FF00', // Green
-  '#0000FF', // Blue
-  '#F08080', // Piggy Pink
-  '#50bda3', // Background Green
-  '#FFD700', // Gold
-  '#FFFFFF', // Eraser
-];
-
-const DrawingTool: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [color, setColor] = useState('#000000');
-  const [lineWidth, setLineWidth] = useState(5);
-
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    setIsDrawing(true);
-    const { offsetX, offsetY } = getCoordinates(e, canvas);
-    ctx.beginPath();
-    ctx.moveTo(offsetX, offsetY);
-    ctx.lineWidth = lineWidth;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = color;
-  };
-
-  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const { offsetX, offsetY } = getCoordinates(e, canvas);
-    ctx.lineTo(offsetX, offsetY);
-    ctx.stroke();
-  };
-
-  const stopDrawing = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    ctx.closePath();
-    setIsDrawing(false);
-  };
-
-  const getCoordinates = (e: React.MouseEvent | React.TouchEvent, canvas: HTMLCanvasElement) => {
-    let clientX, clientY;
-    if ('touches' in e) {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      clientX = (e as React.MouseEvent).clientX;
-      clientY = (e as React.MouseEvent).clientY;
-    }
-    const rect = canvas.getBoundingClientRect();
-    return {
-      offsetX: clientX - rect.left,
-      offsetY: clientY - rect.top
-    };
-  };
-
-  const clearCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-  };
-
-  const downloadCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const link = document.createElement('a');
-    link.download = 'my-usdut-masterpiece.png';
-    link.href = canvas.toDataURL();
-    link.click();
-  };
-
-  // Initialize white background
-  useEffect(() => {
-    clearCanvas();
-  }, []);
-
-  return (
-    <div className="flex flex-col items-center gap-4 w-full">
-      <div className="border-4 border-black bg-white shadow-[8px_8px_0_rgba(0,0,0,0.2)]">
-        <canvas
-          ref={canvasRef}
-          width={window.innerWidth < 600 ? 300 : 600}
-          height={400}
-          className="cursor-crosshair touch-none"
-          onMouseDown={startDrawing}
-          onMouseMove={draw}
-          onMouseUp={stopDrawing}
-          onMouseLeave={stopDrawing}
-          onTouchStart={startDrawing}
-          onTouchMove={draw}
-          onTouchEnd={stopDrawing}
-        />
-      </div>
-      
-      <div className="flex flex-wrap justify-center gap-4 bg-white p-4 hand-drawn-border rotate-1">
-        {/* Colors */}
-        <div className="flex gap-2 items-center">
-          {COLORS.map((c) => (
-            <button
-              key={c}
-              onClick={() => setColor(c)}
-              className={`w-8 h-8 rounded-full border-2 border-black transition-transform hover:scale-110 ${color === c ? 'ring-2 ring-offset-2 ring-black' : ''}`}
-              style={{ backgroundColor: c }}
-              aria-label={`Select color ${c}`}
-            />
-          ))}
-        </div>
-
-        <div className="w-px h-8 bg-black/20 mx-2"></div>
-
-        {/* Brush Size */}
-        <div className="flex gap-2 items-center">
-          <button onClick={() => setLineWidth(5)} className={`p-1 ${lineWidth === 5 ? 'bg-gray-200' : ''} rounded`}>
-            <div className="w-2 h-2 bg-black rounded-full"></div>
-          </button>
-          <button onClick={() => setLineWidth(10)} className={`p-1 ${lineWidth === 10 ? 'bg-gray-200' : ''} rounded`}>
-            <div className="w-4 h-4 bg-black rounded-full"></div>
-          </button>
-          <button onClick={() => setLineWidth(20)} className={`p-1 ${lineWidth === 20 ? 'bg-gray-200' : ''} rounded`}>
-            <div className="w-6 h-6 bg-black rounded-full"></div>
-          </button>
-        </div>
-
-        <div className="w-px h-8 bg-black/20 mx-2"></div>
-
-        {/* Actions */}
-        <div className="flex gap-2">
-          <button onClick={clearCanvas} className="p-2 hover:bg-red-100 rounded text-red-600 transition-colors" title="Clear Canvas">
-            <TrashIcon />
-          </button>
-          <button onClick={downloadCanvas} className="p-2 hover:bg-green-100 rounded text-green-600 transition-colors" title="Download">
-            <DownloadIcon />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-
-const MEME_IMAGES = [
-  "https://pbs.twimg.com/media/Gzj0U6SWQAE7axL?format=jpg&name=large",
-  "https://pbs.twimg.com/media/GzmfUhMWkAAVSTu?format=jpg&name=large",
-  "https://pbs.twimg.com/media/GziAQzIWsAAR4sG?format=jpg&name=large",
-  "https://pbs.twimg.com/media/Gzq4TkMXYAAjNG7?format=jpg&name=medium",
-  "https://pbs.twimg.com/media/Gzoq0B0XMAAHp8p?format=jpg&name=large",
-  "https://pbs.twimg.com/media/GzrZeO1X0AAGOL6?format=jpg&name=large",
-  "https://pbs.twimg.com/media/GzsbWcEWYAAh36x?format=jpg&name=large",
-  "https://pbs.twimg.com/media/GzvivFiXgAAnxzT?format=jpg&name=large",
-  "https://pbs.twimg.com/media/GzwPrPcWIAARVfN?format=jpg&name=large",
-  "https://pbs.twimg.com/media/GzxkBBzXQAEwSfl?format=jpg&name=medium"
-];
-
-const MemeMarquee: React.FC = () => {
-  return (
-    <div className="overflow-hidden bg-[#222] py-6 border-y-4 border-black rotate-1 z-30 relative my-12 shadow-[0_0_20px_rgba(0,0,0,0.3)]">
-      <div className="flex w-max animate-scroll hover:pause">
-        {/* Render images multiple times for seamless looping */}
-        {[...MEME_IMAGES, ...MEME_IMAGES, ...MEME_IMAGES].map((src, i) => (
-          <div key={i} className="mx-4 transform hover:scale-105 transition-transform duration-300">
-             <img 
-               src={src} 
-               alt={`Meme ${i}`} 
-               className="h-64 w-auto rounded-xl border-4 border-white shadow-[4px_4px_0_#000] object-cover bg-white" 
-             />
-          </div>
-        ))}
-      </div>
-      <style>{`
-        @keyframes scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-33.33%); }
-        }
-        .animate-scroll {
-          animation: scroll 40s linear infinite;
-        }
-        .hover\\:pause:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
-    </div>
-  );
-};
+const RefreshIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+    <path d="M21 3v5h-5" />
+  </svg>
+);
 
 const App: React.FC = () => {
-  const CA = "3vz82EWYv8xnc7Cm7qSgERcpMeqw92PcX8PBz88npump";
-  const TICKER = "$USDUT";
-  const LOGO_URL = "https://pbs.twimg.com/profile_images/1960730761067163648/Jo0qh4hm_400x400.jpg";
-  const X_LINK = "https://x.com/usdutcto?s=21";
+  const CA = "2oCxjpWWEmCuNaXiBSVahUKP1xRMRAiBfCg98YyHpump";
+  const TICKER = "$BLACKBULL";
+  const PROJECT_NAME = "BlackBull";
+  const LOGO_URL = "https://pbs.twimg.com/profile_images/2014036873820110848/SAIdoDZc_400x400.jpg";
+  const HERO_BG_URL = "https://www.shutterstock.com/image-illustration/darkness-telescope-solar-shine-horizontal-600nw-2489424719.jpg";
+  const MANIFESTO_BANNER = "https://pbs.twimg.com/profile_banners/2009551887058739200/1769018796/600x200";
+  const X_LINK = "https://x.com/blackbullonsol?s=21";
   const PUMP_LINK = `https://pump.fun/coin/${CA}`;
   const DEX_LINK = `https://dexscreener.com/solana/${CA}`;
 
+  const [copied, setCopied] = useState(false);
+
   const copyCA = () => {
     navigator.clipboard.writeText(CA);
-    alert("Contract Address Copied!");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
+  const roadmapItems = [
+    {
+      phase: "Phase I",
+      title: "The Genesis",
+      desc: "Launched on pump.fun. Initial surge of chaos and the birth of the herd.",
+      icon: <RocketIcon />,
+      side: "left" as const
+    },
+    {
+      phase: "Phase II",
+      title: "Community Takeover",
+      desc: "When the original team left, the true bulls stepped up. A Community Takeover (CTO) initiated to secure the future.",
+      icon: <RefreshIcon />,
+      side: "right" as const
+    },
+    {
+      phase: "Phase III",
+      title: "The Expansion",
+      desc: "Scaling the community. Building trust and awareness across the Solana arena.",
+      icon: <UsersIcon />,
+      side: "left" as const
+    },
+    {
+      phase: "Phase IV",
+      title: "The Great Stampede",
+      desc: "Pushing the market cap into the multi-millions. Total arena dominance.",
+      icon: <FlagIcon />,
+      side: "right" as const
+    }
+  ];
+
   return (
-    <div className="min-h-screen text-black overflow-x-hidden relative bg-[#50bda3]">
-      {/* Texture Overlay for Paper Feel */}
-      <div className="fixed inset-0 opacity-10 pointer-events-none z-10" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/crumpled-paper.png")' }}></div>
-
-      {/* Animated Unstable Background */}
-      <UnstableChartBackground />
-
+    <div className="min-h-screen bg-[#1a1c22] text-white selection:bg-white selection:text-black">
+      
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 p-4">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center bg-white/95 backdrop-blur-sm border-2 border-black rounded-xl px-6 py-3 shadow-[4px_4px_0_rgba(0,0,0,1)] gap-4 md:gap-0">
-          <div className="flex items-center gap-3">
-            <img src={LOGO_URL} alt="Logo" className="w-10 h-10 rounded-full border-2 border-black" />
-            <h1 className="text-xl md:text-2xl font-bold tracking-wider">{TICKER}</h1>
+      <nav className="fixed top-0 left-0 right-0 z-50 p-8 flex justify-between items-center bg-gradient-to-b from-black/40 to-transparent">
+        <div className="flex items-center gap-4">
+          <img src={LOGO_URL} alt="Logo" className="w-8 h-8 rounded-full border border-white/10" />
+          <div className="flex flex-col">
+            <span className="text-[11px] font-medium tracking-widest uppercase opacity-90">{PROJECT_NAME}</span>
+            <span className="text-[10px] tracking-[0.2em] opacity-50">{TICKER}</span>
           </div>
-          
-          {/* Quick Links */}
-          <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-lg font-bold font-hand">
-            <a href="#about" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">ABOUT</a>
-            <a href="#draw" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">DRAW</a>
-            <a href="#howto" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">HOW TO BUY</a>
-            <a href="#chart" className="hover:text-teal-600 hover:underline decoration-wavy transition-colors">CHART</a>
-          </div>
+        </div>
+        
+        <div className="hidden md:flex gap-12 items-center">
+          <a href="#manifesto" className="nav-link">Manifesto</a>
+          <a href="#roadmap" className="nav-link">Roadmap</a>
+          <a href="#token" className="nav-link">Token</a>
+          <a href="#chart" className="nav-link">Radar</a>
+        </div>
 
-          <div className="flex gap-4 items-center">
-             <a href={X_LINK} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform">
-               <XIcon />
-             </a>
-             <a href={DEX_LINK} target="_blank" rel="noopener noreferrer" className="bg-black text-white px-4 py-1 rounded-full font-bold hover:bg-gray-800 transition-colors">
-               CHART
-             </a>
-          </div>
+        <div>
+          <a href={X_LINK} target="_blank" rel="noopener noreferrer" className="opacity-40 hover:opacity-100 transition-opacity">
+            <XIcon />
+          </a>
         </div>
       </nav>
 
-      {/* Hero Header */}
-      <header id="buy" className="pt-40 pb-12 px-4 text-center relative z-20">
-        <div className="max-w-4xl mx-auto flex flex-col items-center">
-          
-          <div className="relative mb-8 group">
-            <div className="absolute inset-0 bg-black rounded-full transform translate-x-2 translate-y-2 group-hover:translate-x-3 group-hover:translate-y-3 transition-transform"></div>
-            <img 
-              src={LOGO_URL} 
-              alt="Unstable Tether Logo" 
-              className="relative w-48 h-48 md:w-64 md:h-64 rounded-full border-4 border-black object-cover wobble z-10" 
-            />
-          </div>
-          
-          <h1 className="text-6xl md:text-9xl mb-2 text-white font-bold drop-shadow-[4px_4px_0_#000] transform -rotate-2">
-            UNSTABLE TETHER
-          </h1>
-          
-          <p className="text-2xl md:text-3xl text-white mb-8 font-bold tracking-widest bg-black inline-block px-4 py-1 transform rotate-1 border-2 border-white">
-            1 USDUT = 1 USDT
-          </p>
-          
-          <div className="bg-white p-4 border-4 border-black mb-8 w-full max-w-2xl transform -rotate-1 shadow-[8px_8px_0_rgba(0,0,0,0.2)]">
-             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                <code className="text-sm md:text-xl font-bold break-all">{CA}</code>
-                <HandButton onClick={copyCA} className="bg-[#f7d51d] hover:bg-[#ffe042] text-sm py-2">
-                  <span className="flex items-center gap-2"><CopyIcon /> COPY</span>
-                </HandButton>
-             </div>
+      {/* Main Sections */}
+      <main className="relative">
+        
+        {/* Hero Section */}
+        <section 
+          className="relative min-h-screen flex flex-col items-center justify-center px-6 text-center"
+          style={{ 
+            backgroundImage: `linear-gradient(to bottom, rgba(26, 28, 34, 0.7), rgba(26, 28, 34, 0.8)), url("${HERO_BG_URL}")`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed'
+          }}
+        >
+          <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-1000">
+            <div className="text-[13px] tracking-[0.5em] font-light uppercase opacity-60 mb-12">
+              {TICKER}
+            </div>
+
+            <h1 className="hero-title text-6xl md:text-[100px] leading-tight font-light text-white/95">
+              Towards the <br /> Charge
+            </h1>
+            
+            <p className="max-w-xl mx-auto text-white/40 font-light text-sm md:text-base leading-loose tracking-wide">
+              A token for those who turn their backs on the herd <br className="hidden md:block" />
+              and march into the interior.
+            </p>
+
+            <div className="flex flex-col md:flex-row items-center justify-center gap-6 pt-12">
+              <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer">
+                <button className="btn-ghost btn-ghost-glow px-12 py-4 rounded-sm flex items-center gap-3 text-sm tracking-widest uppercase font-light">
+                  <BuyIcon /> Buy {TICKER}
+                </button>
+              </a>
+              
+              <button 
+                onClick={copyCA}
+                className="btn-ghost px-12 py-4 rounded-sm flex items-center gap-3 text-sm tracking-widest uppercase font-light"
+              >
+                <HeartIcon /> {copied ? 'ID Copied' : 'Join the Arena'}
+              </button>
+            </div>
+
+            <div className="pt-8">
+              <a href="#manifesto" className="text-white/40 hover:text-white transition-colors text-xs tracking-widest uppercase font-light flex items-center justify-center gap-2 group">
+                Read the Manifesto <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
+              </a>
+            </div>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-6">
-            <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer">
-              <HandButton className="bg-[#ff85a1] hover:bg-[#ff99b1] transform rotate-1">
-                BUY ON PUMP.FUN
-              </HandButton>
-            </a>
-            <a href={DEX_LINK} target="_blank" rel="noopener noreferrer">
-              <HandButton className="bg-white hover:bg-gray-100 transform -rotate-1">
-                DEXSCREENER
-              </HandButton>
-            </a>
+          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 opacity-30">
+            <div className="flex flex-col items-center gap-2">
+              <img src={LOGO_URL} alt="Mini Icon" className="w-4 h-4 rounded-full grayscale" />
+              <div className="w-[1px] h-4 bg-white/50"></div>
+            </div>
           </div>
-        </div>
-      </header>
+        </section>
 
-      {/* Floating Meme Marquee */}
-      <MemeMarquee />
-
-      {/* Handwritten Story Section */}
-      <section id="about" className="py-20 px-4 relative z-20">
-        <div className="max-w-5xl mx-auto">
-          <PaperCard rotate="rotate-1" className="bg-[#fffbeb]">
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              {/* Image (Left) */}
-              <div className="w-full md:w-1/2">
-                <img 
-                  src="https://pbs.twimg.com/media/GzoYVH9WwAASDbt?format=jpg&name=large" 
-                  alt="Unstable Tether Meme" 
-                  className="w-full rounded-lg border-4 border-black transform -rotate-1 shadow-[6px_6px_0_rgba(0,0,0,0.2)] hover:scale-105 transition-transform duration-300"
-                />
+        {/* Manifesto Section */}
+        <section id="manifesto" className="py-40 px-6 bg-[#1a1c22]">
+          <div className="max-w-2xl mx-auto space-y-16">
+            <div className="space-y-12">
+              <div className="space-y-4 text-center md:text-left">
+                <span className="text-[10px] tracking-[0.4em] uppercase text-white/30">Manifesto</span>
+                <h2 className="text-4xl font-light italic leading-relaxed">"The market is a chaotic arena of noise and hesitation. In this landscape, the BlackBull does not browse; it conquers."</h2>
               </div>
-
-              {/* Text (Right) */}
-              <div className="w-full md:w-1/2 font-hand text-xl md:text-2xl space-y-4">
-                <p>Hi. We are <span className="font-bold text-teal-600">Unstable Tether</span>.</p>
-                <p>Unlike other stablecoins that promise you $1.00 and give you anxiety, we promise you nothing and give you vibes.</p>
-                <p>We are fully audited by "Trust Me Bro LLC". Our reserves are backed by hopes, dreams, and a half-eaten sandwich I found earlier.</p>
-                <p className="font-bold text-3xl mt-4 transform rotate-1">STAY UNSTABLE.</p>
+              
+              {/* Requested Image in About Section */}
+              <div className="w-full grayscale border border-white/5 p-1 bg-white/[0.02]">
+                <img src={MANIFESTO_BANNER} alt="BlackBull Banner" className="w-full block" />
               </div>
             </div>
-          </PaperCard>
-        </div>
-      </section>
-
-      {/* Stats (Hand drawn style) */}
-      <section id="stats" className="py-10 px-4 relative z-20">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8">
-            <PaperCard rotate="-rotate-2" className="text-center bg-white">
-              <div className="text-5xl mb-2">💸</div>
-              <h3 className="text-2xl font-bold">Total Supply</h3>
-              <p className="text-4xl font-black mt-2">1 Billion</p>
-            </PaperCard>
             
-            <PaperCard rotate="rotate-2" className="text-center bg-white">
-              <div className="text-5xl mb-2">🔥</div>
-              <h3 className="text-2xl font-bold">Liquidity</h3>
-              <p className="text-4xl font-black mt-2">Burnt</p>
-            </PaperCard>
+            <div className="font-light text-white/40 leading-relaxed text-lg space-y-8 text-justify">
+              <p>
+                We are the antithesis of the stable, the predictable, and the weak. Our power is not derived from logic, but from the raw, high-voltage energy of the collective herd. 
+              </p>
+              <p>
+                To live is to charge. To stall is to vanish. We are building a community that strikes like lightning. When others retreat, we accelerate. Our ticker is a declaration of war against the red candles of mediocrity.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Roadmap Section */}
+        <section id="roadmap" className="py-40 px-6 bg-[#1a1c22] relative overflow-hidden">
+           <div className="max-w-5xl mx-auto flex flex-col items-center">
+              <h2 className="text-[12px] tracking-[0.5em] font-light uppercase text-white/40 mb-24">Roadmap Strategy</h2>
+              
+              <div className="relative w-full">
+                {/* Vertical Center Line */}
+                <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[1px] bg-white/10 hidden md:block"></div>
+                
+                <div className="space-y-24 md:space-y-12">
+                  {roadmapItems.map((item, idx) => (
+                    <div key={idx} className={`relative flex flex-col md:flex-row items-center w-full ${item.side === 'left' ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+                      
+                      {/* Side Content */}
+                      <div className="md:w-1/2 flex justify-center">
+                         <div className={`w-full max-w-[340px] bg-black/40 border border-white/5 p-8 relative transition-all hover:bg-white/[0.02] ${item.side === 'left' ? 'md:mr-16' : 'md:ml-16'}`}>
+                            <div className="flex items-center justify-between mb-4">
+                               <span className="text-[10px] tracking-widest text-white/40 uppercase">{item.phase}</span>
+                               <span className="opacity-40">{item.icon}</span>
+                            </div>
+                            <h3 className="text-xl font-light tracking-wide mb-3">{item.title}</h3>
+                            <p className="text-xs font-light leading-relaxed text-white/30 uppercase tracking-widest">{item.desc}</p>
+                         </div>
+                      </div>
+
+                      {/* Center Dot */}
+                      <div className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#1a1c22] border border-white/40 rounded-full hidden md:flex items-center justify-center z-10">
+                        <div className="w-1 h-1 bg-white rounded-full"></div>
+                      </div>
+                      
+                    </div>
+                  ))}
+                </div>
+              </div>
+           </div>
+        </section>
+
+        {/* Token Specifications Section */}
+        <section id="token" className="py-32 px-6 bg-gradient-to-b from-[#1a1c22] to-[#14161a]">
+          <div className="max-w-5xl mx-auto flex flex-col items-center text-center">
             
-            <PaperCard rotate="-rotate-1" className="text-center bg-white">
-              <div className="text-5xl mb-2">📉</div>
-              <h3 className="text-2xl font-bold">Peg Status</h3>
-              <p className="text-4xl font-black mt-2">Unstable</p>
-            </PaperCard>
+            <h2 className="text-[12px] tracking-[0.5em] font-light uppercase text-white/40 mb-16">
+              Token Specifications
+            </h2>
+
+            {/* Contract Address Box */}
+            <div className="w-full max-w-4xl bg-black/40 border border-white/5 p-12 mb-1">
+              <div className="text-[10px] tracking-[0.4em] uppercase text-white/30 mb-4">Contract Address</div>
+              <code className="text-sm md:text-xl font-light tracking-[0.1em] text-white/90 break-all cursor-pointer hover:text-white transition-colors" onClick={copyCA}>
+                {CA}
+              </code>
+              {copied && <div className="text-[9px] mt-2 tracking-widest text-white/40 uppercase">Synced to Clipboard</div>}
+            </div>
+
+            {/* Stats Grid */}
+            <div className="w-full max-w-4xl grid grid-cols-2 lg:grid-cols-4 bg-black/40 border border-white/5 overflow-hidden">
+              <div className="flex flex-col items-center justify-center p-12 border-b lg:border-b-0 lg:border-r border-white/5 transition-colors hover:bg-white/[0.02]">
+                <SupplyIcon />
+                <span className="text-3xl font-light tracking-widest mt-6">1B</span>
+                <span className="text-[9px] tracking-[0.2em] uppercase text-white/30 mt-2">Total Supply</span>
+              </div>
+              <div className="flex flex-col items-center justify-center p-12 border-b lg:border-b-0 lg:border-r border-white/5 transition-colors hover:bg-white/[0.02]">
+                <TaxIcon />
+                <span className="text-3xl font-light tracking-widest mt-6">0/0</span>
+                <span className="text-[9px] tracking-[0.2em] uppercase text-white/30 mt-2">Tax</span>
+              </div>
+              <div className="flex flex-col items-center justify-center p-12 border-b md:border-b-0 lg:border-r border-white/5 transition-colors hover:bg-white/[0.02]">
+                <BurntIcon />
+                <span className="text-3xl font-light tracking-widest mt-6">100%</span>
+                <span className="text-[9px] tracking-[0.2em] uppercase text-white/30 mt-2">Burnt</span>
+              </div>
+              <div className="flex flex-col items-center justify-center p-12 transition-colors hover:bg-white/[0.02]">
+                <NetworkIcon />
+                <span className="text-3xl font-light tracking-widest mt-6">SOL</span>
+                <span className="text-[9px] tracking-[0.2em] uppercase text-white/30 mt-2">Network</span>
+              </div>
+            </div>
+
+            {/* Quote Bottom */}
+            <p className="mt-20 font-serif italic text-white/40 text-sm tracking-wide">
+              "True to the Nietzschean spirit of freedom—no tax, no restrictions, no turning back."
+            </p>
+
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Drawing Section */}
-      <section id="draw" className="py-20 px-4 relative z-20">
-        <div className="max-w-4xl mx-auto flex flex-col items-center">
-          <h2 className="text-5xl md:text-6xl text-center mb-10 text-white font-bold drop-shadow-[4px_4px_0_#000] transform rotate-1">
-            DRAW YOUR USDUT
-          </h2>
-          <DrawingTool />
-        </div>
-      </section>
-
-      {/* How To Buy Section */}
-      <section id="howto" className="py-20 px-4 relative z-20">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-5xl md:text-7xl text-center mb-12 text-white font-bold drop-shadow-[4px_4px_0_#000] transform -rotate-2">
-            HOW TO BUY
-          </h2>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Step 1 */}
-            <PaperCard rotate="-rotate-2" className="bg-[#e0f2f1] hover:scale-105 transition-transform duration-300">
-              <div className="text-4xl font-bold mb-4 bg-black text-white w-12 h-12 flex items-center justify-center rounded-full border-2 border-white">1</div>
-              <h3 className="text-2xl font-bold mb-2">Create Wallet</h3>
-              <p className="text-lg">Download Phantom or any Solana wallet. It's like a pocket, but digital and safer (usually).</p>
-            </PaperCard>
-
-            {/* Step 2 */}
-            <PaperCard rotate="rotate-1" className="bg-[#fff9c4] hover:scale-105 transition-transform duration-300">
-              <div className="text-4xl font-bold mb-4 bg-black text-white w-12 h-12 flex items-center justify-center rounded-full border-2 border-white">2</div>
-              <h3 className="text-2xl font-bold mb-2">Get SOL</h3>
-              <p className="text-lg">Buy Solana from an exchange and send it to your wallet. Fuel for the rocket.</p>
-            </PaperCard>
-
-            {/* Step 3 */}
-            <PaperCard rotate="-rotate-1" className="bg-[#ffebee] hover:scale-105 transition-transform duration-300">
-              <div className="text-4xl font-bold mb-4 bg-black text-white w-12 h-12 flex items-center justify-center rounded-full border-2 border-white">3</div>
-              <h3 className="text-2xl font-bold mb-2">Go to Pump.fun</h3>
-              <p className="text-lg">Connect your wallet. Don't worry, we won't tell your mom what you're doing.</p>
-              <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer" className="block mt-4 text-center bg-black text-white py-2 rounded font-bold hover:bg-gray-800">GO TO LINK</a>
-            </PaperCard>
-
-            {/* Step 4 */}
-            <PaperCard rotate="rotate-2" className="bg-[#e3f2fd] hover:scale-105 transition-transform duration-300">
-              <div className="text-4xl font-bold mb-4 bg-black text-white w-12 h-12 flex items-center justify-center rounded-full border-2 border-white">4</div>
-              <h3 className="text-2xl font-bold mb-2">Buy $USDUT</h3>
-              <p className="text-lg">Swap SOL for USDUT. Welcome to the unstable family. Hold tight.</p>
-            </PaperCard>
+        {/* Radar Section */}
+        <section id="chart" className="py-24 px-6 bg-[#14161a] border-t border-white/5">
+          <div className="max-w-6xl mx-auto">
+            <div className="bg-white/[0.02] border border-white/5 p-1">
+              <div className="relative w-full pb-[60%] lg:pb-[45%] grayscale hover:grayscale-0 transition-all duration-1000">
+                <iframe 
+                  src={`https://dexscreener.com/solana/${CA}?embed=1&loadChartSettings=0&chartLeftToolbar=0&chartTheme=dark&theme=dark&chartStyle=1&chartType=usd&interval=15`}
+                  title="BlackBull Chart"
+                  className="absolute inset-0 w-full h-full border-0"
+                />
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Chart Section */}
-      <section id="chart" className="py-20 px-4 relative z-20">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-5xl md:text-7xl text-center mb-10 text-white font-bold drop-shadow-[4px_4px_0_#000]">
-            LIVE CHART
-          </h2>
-          <div className="border-4 border-black bg-white p-2 shadow-[12px_12px_0_rgba(0,0,0,0.2)] transform rotate-1">
-             <div className="relative w-full pb-[65%]">
-               <iframe 
-                 src={`https://dexscreener.com/solana/${CA}?embed=1&loadChartSettings=0&chartLeftToolbar=0&chartTheme=light&theme=light&chartStyle=1&chartType=usd&interval=15`}
-                 title="DexScreener Chart"
-                 className="absolute w-full h-full top-0 left-0 border-0"
-               ></iframe>
-             </div>
-          </div>
-        </div>
-      </section>
+      </main>
 
       {/* Footer */}
-      <footer className="py-12 text-center text-white/80 relative z-20">
-        <div className="flex justify-center gap-8 mb-8">
-           <a href={X_LINK} target="_blank" rel="noopener noreferrer" className="text-white hover:text-black transition-colors transform hover:scale-125">
-             <XIcon />
-           </a>
-           <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer" className="text-white hover:text-black transition-colors transform hover:scale-125">
-             <ChartIcon />
-           </a>
+      <footer className="py-24 px-8 border-t border-white/5 bg-[#14161a] flex flex-col items-center text-center">
+        <div className="max-w-md mx-auto space-y-12">
+          
+          <div className="space-y-4">
+             <img src={LOGO_URL} alt="Footer Logo" className="w-12 h-12 rounded-full mx-auto grayscale border border-white/10 p-0.5" />
+             <div className="flex flex-col">
+                <span className="text-[12px] font-medium tracking-[0.4em] uppercase">{PROJECT_NAME}</span>
+                <span className="text-[10px] tracking-[0.2em] opacity-40 uppercase">Solana Ecosystem</span>
+             </div>
+          </div>
+
+          <p className="font-serif italic text-white/40 text-sm italic">"Towards the charge."</p>
+
+          <div className="flex gap-4 justify-center">
+            <a href={X_LINK} target="_blank" rel="noopener noreferrer" className="p-4 border border-white/5 hover:border-white/20 transition-all opacity-40 hover:opacity-100">
+               <XIcon />
+            </a>
+            <a href={DEX_LINK} target="_blank" rel="noopener noreferrer" className="p-4 border border-white/5 hover:border-white/20 transition-all opacity-40 hover:opacity-100">
+               <ChartIcon />
+            </a>
+            <a href={PUMP_LINK} target="_blank" rel="noopener noreferrer" className="p-4 border border-white/5 hover:border-white/20 transition-all opacity-40 hover:opacity-100">
+               <HeartIcon />
+            </a>
+          </div>
+
+          <div className="pt-8 border-t border-white/5 space-y-4">
+             <p className="text-[9px] leading-relaxed opacity-20 uppercase tracking-[0.2em] max-w-xs mx-auto">
+               $BLACKBULL IS A TOKEN FOR THOSE WHO SEEK THE INTERIOR. NO INTRINSIC VALUE. NO PROMISES. ONLY THE CHARGE.
+             </p>
+             <p className="text-[10px] tracking-[0.3em] uppercase opacity-40">BlackBull Collective © 2026</p>
+          </div>
         </div>
-        <p className="text-xl font-bold">
-          $USDUT is a memecoin with no intrinsic value or expectation of financial return.
-        </p>
-        <p className="mt-2 text-sm opacity-60">
-          (But it's funny though)
-        </p>
       </footer>
     </div>
   );
